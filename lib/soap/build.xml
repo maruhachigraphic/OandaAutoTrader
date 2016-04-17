@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+	Purpose : generate the Oanda SOAP Server jar file
+	Usage : ant soap_server
+-->
+<project name="API" default="soap_server" basedir=".">
+	<!-- compile options -->
+	<property name="debuglevel" value = "source,lines,vars" />
+	<property name="debug"      value = "true" />
+	<property name="target"     value = "1.5" />
+	<property name="source"     value = "1.5" />
+	
+	<target
+	    name="soap_server"
+	    description="Compile SoapServer classes">
+
+   		<delete dir="bin" />
+    	<mkdir  dir="bin"/>
+
+		<!-- creates the SoapServer JAR -->
+		<javac
+		    srcdir="."
+		    destdir="bin"
+		    target="${target}"
+		    source="${source}"
+			debug="${debug}"
+			debuglevel="${debuglevel}"
+			classpath="../oanda_fxtrade.jar">
+			<include name="com/oanda/fxtrade/api/soap/*.java" />
+		</javac>
+
+		<delete file="oanda_fxtrade_soap_server.jar" />
+     	<delete file="MANIFEST.MF"/>
+
+		<tstamp>
+            <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+        </tstamp>
+
+        <manifest file="MANIFEST.MF">
+            <attribute name="Built-By" value="OANDA"/>
+            <attribute name="Implementation-Version"
+                value="Custom Build"/>
+            <attribute name="Built-Date" value="${TODAY}"/>
+            <attribute name="Main-Class" value="com.oanda.fxtrade.api.soap.SoapServer"/>
+        </manifest>
+
+		<jar destfile="oanda_fxtrade_soap_server.jar" manifest="MANIFEST.MF">
+			<zipfileset src="../oanda_fxtrade.jar" />
+			<fileset dir="bin" includes="com/oanda/fxtrade/api/soap/*.class" />
+		</jar>
+
+	</target>
+
+</project>
