@@ -36,7 +36,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * OandaAutoTraderのバージョンをStringで格納
      */
-    public static final String VERSION = "OandaAutoTrader ver0.4";
+    public static final String VERSION = "OandaAutoTrader ver0.41";
 
     // For keyboard input
     /**
