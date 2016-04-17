@@ -33,7 +33,6 @@ public class EMA extends IndicatorTemplate {
         this.closeList = new ArrayList<>();
         this.dayList = new ArrayList<>();
         this.emaList = new ArrayList<>();
-
         alpha = 2.0 / (span + 1.0);//α：平滑定数
 
         //unixtimeとcloseのListを取得
@@ -71,17 +70,16 @@ public class EMA extends IndicatorTemplate {
             total += closeListLocal.get(i);
         }
         double firstema = total / span;
-
         emaList.add(firstema);
-
         int spansecond = span + 1;
         double secondema;
         //2日目以降の計算
         double zenjitu;
         double touzituowarine;
-        int roopsize = closeListLocal.size() - span;
+        int roopsize = closeListLocal.size() -1;
+
         for (int i = 0; i < roopsize; i++) {
-            zenjitu = emaList.get(i);
+            zenjitu = emaList.get(i);//emaListには初日が入っているので0から始める
             touzituowarine = closeListLocal.get(i + 1);
             //System.out.println("当日終値：" + touzituowarine + "前日終値:" + zenjitu + "alpha:" + this.alpha);
             double thrdema = zenjitu + (this.alpha * (touzituowarine - zenjitu));

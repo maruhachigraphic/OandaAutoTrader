@@ -48,19 +48,12 @@ public class MACD extends IndicatorTemplate {
         ArrayList<Double> emaSlst;
         ArrayList<Double> emaMlst;
 
-        EMA emaS = new EMA(fxArrayData, spanS);
-        EMA emaM = new EMA(fxArrayData, spanM);
+        EMA emaS = new EMA(this.fxArrayData, this.spanS);
+        EMA emaM = new EMA(this.fxArrayData, this.spanM);
         emaSlst = emaS.emaList;
         emaMlst = emaM.emaList;
-        //System.out.println("ema S");
-        //emaSlst.forEach(System.out::println);
 
-        //spanSとspanMのリストサイズを揃える
-        int sum = spanM - spanS;
-        for (int i = 0; i < sum; i++) {//
-            emaSlst.remove(0);//sumの分だけ最初のリストを削除
-        }
-
+        
         //MACD計算
         for (int i = 0; i < emaSlst.size(); i++) {//
             double macdsum = emaSlst.get(i) - emaMlst.get(i);
@@ -75,14 +68,14 @@ public class MACD extends IndicatorTemplate {
         //MACDヒストグラム計算のための準備
         //macdListとmacdSignalのリストサイズを揃える
         int arraySpan = this.macdList.size() - this.macdSignal.size();
-        ArrayList<Double> macdListCopy = new ArrayList<>(macdList);//長い方を一旦コピーする
+        //ArrayList<Double> macdListCopy = new ArrayList<>(macdList);//長い方を一旦コピーする
         for (int i = 0; i < arraySpan; i++) {
-            macdListCopy.remove(0);//sumの分だけ最初のリストを削除
+            macdList.remove(0);//sumの分だけ最初のリストを削除
         }
         
         //MACDヒストグラムの計算
-        for (int i = 0; i < macdListCopy.size(); i++) {
-            double a = macdListCopy.get(i) - this.macdSignal.get(i);
+        for (int i = 0; i < macdList.size(); i++) {
+            double a = macdList.get(i) - this.macdSignal.get(i);
             this.macdHistgram.add(a);
         }
     }
