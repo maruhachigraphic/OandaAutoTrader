@@ -18,7 +18,7 @@ AccountID = 口座のアカウントID<br>
 $ cd user/hoge/<br>
 $ java -jar "任意のディレクトリ/OandaAutoTrader.jar" 2>output.log<br>
 
-COUTION
+CAUTION
 ----------------------------------------
 プロパティーデータのセキュリティーは各自で対策してください。
 製作者は一切の責任を負いません。
