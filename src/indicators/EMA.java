@@ -17,15 +17,31 @@ import java.util.List;
 public class EMA extends IndicatorTemplate {
 
     public double alpha;
+
+    /**
+     *unixtimeのリスト
+     */
     public ArrayList<Long> dayList;//unixtimeのリスト
+
+    /**
+     *終値のリスト
+     */
     public ArrayList<Double> closeList;//終値のリスト
+
+    /**
+     *EMAのリスト
+     */
     public ArrayList<Double> emaList;//EMAのリスト
+
+    /**
+     *シグナル用MACDのリスト
+     */
     public ArrayList<Double> macdSignal;//シグナル用MACDのリスト
 
     /**
      *通常のEMAコンストラクタ
-     * @param fxArrayData
-     * @param span
+     * @param fxArrayData 日足のArraYList
+     * @param span EMAの期間
      */
     public EMA(ArrayList<String[]> fxArrayData, int span) {
         this.span = span;//IndicatorTemplateのcheckSizeに代入
@@ -47,8 +63,8 @@ public class EMA extends IndicatorTemplate {
 
     /**
      *MACDのシグナル用EMAコンストラクタ
-     * @param macd
-     * @param span
+     * @param macd 呼び出し元のMACDクラスからthisを代入する。
+     * @param span MACDシグナルの期間
      */
     public EMA(MACD macd, int span) {
         this.span = span;
