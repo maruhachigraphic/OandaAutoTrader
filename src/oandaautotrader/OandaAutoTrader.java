@@ -65,7 +65,7 @@ public class OandaAutoTrader implements Observer {
      * ストラテジーで取得した結果を代入する変数
      */
     public static volatile double[] strategyResult;
-    
+
     /**
      * 現在建てているトランザクションナンバー
      */
@@ -88,7 +88,7 @@ public class OandaAutoTrader implements Observer {
     public final int sleepCount;
 
     /**
-     *日足のインターバル、MACDシグナル、中長期間、短期期間 
+     * 日足のインターバル、MACDシグナル、中長期間、短期期間
      */
     public static long interval;
     public static int signal;
@@ -101,17 +101,17 @@ public class OandaAutoTrader implements Observer {
     public OandaAutoTrader() {
         //プロパティーの呼び出し
         fileReader();
-        
+
         //FXPairの設定
         this.fxpair = com.oanda.fxtrade.api.API.createFXPair("USD/JPY");
-        
+
         //トレーリングストップの設定
         TSL = 0.0;
-        
+
         //全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
-        time = 600;//分を入れる（10時間） 
+        time = 360;//分を入れる（10時間） 
         sleepCount = (time * 60 * 1000);
-        
+
         //ストラテジーの期間を設定
         interval = TimeGetter.TIME1MIN;
         signal = 8;
@@ -254,18 +254,24 @@ public class OandaAutoTrader implements Observer {
             if (source == fxclient) {
                 // connected to server, update User, Account and RateTable
                 if (status.equals(FXClient.CONNECTED)) {
-                    System.out.println("Example: setting user...");
+                    System.out.println("OAT: setting user...");
                     user = fxclient.getUser();
                     //
-                    System.out.println("Example: setting account...");
+                    System.out.println("OAT: setting account...");
                     account = (Account) user.getAccounts().elementAt(0);
                     //
-                    System.out.println("Example: fetching rate table...");
+                    System.out.println("OAT: fetching rate table...");
                     rateTable = fxclient.getRateTable();//fxclientからRateTableを取得する
                 } // disconnected from server, attempt reconnection
                 else if (status.equals(FXClient.DISCONNECTED)) {
-                    System.out.println("Example: disconnection detected.  attempting to reconnect...");
-                    fxclient.login(username, password, "Example2 Test");
+                    System.out.println("OAT: 接続が切れました。 再接続を試みます...");
+                    fxclient.login(username, password, "OandaAutoTraderReconnect");
+                    //アカウントの設定
+                    try {
+                        account = user.getAccountWithId(accountID);
+                    } catch (AccountException ex) {
+                        Logger.getLogger(OandaAutoTrader.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
 
             }
@@ -295,7 +301,7 @@ public class OandaAutoTrader implements Observer {
         }
     }
 
-    private void fileReader(){
+    private void fileReader() {
         Reader fr = null;
         try {
             fr = new FileReader("OandaAutoTrader.properties");
@@ -316,10 +322,10 @@ public class OandaAutoTrader implements Observer {
             }
         }
     }
-    
-    private void orderClose(){
+
+    private void orderClose() {
         SetOrder setorder = new SetOrder(this);
         setorder.setRelease(transactionNum);
     }
-    
+
 }
