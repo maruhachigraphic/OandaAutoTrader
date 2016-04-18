@@ -5,14 +5,10 @@
  */
 package oandaautotrader;
 
-import com.oanda.fxtrade.api.API;
 import com.oanda.fxtrade.api.Account;
 import com.oanda.fxtrade.api.AccountException;
 import com.oanda.fxtrade.api.FXClient;
-import com.oanda.fxtrade.api.FXHistoryPoint;
 import com.oanda.fxtrade.api.FXPair;
-import com.oanda.fxtrade.api.OAException;
-import com.oanda.fxtrade.api.RateTable;
 import com.oanda.fxtrade.api.Transaction;
 import java.util.ArrayList;
 import java.util.Vector;

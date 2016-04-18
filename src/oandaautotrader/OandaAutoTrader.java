@@ -36,7 +36,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * OandaAutoTraderのバージョンをStringで格納
      */
-    public static final String VERSION = "OandaAutoTrader ver0.41";
+    public static final String VERSION = "OandaAutoTrader ver0.42";
 
     // For keyboard input
     /**
@@ -101,16 +101,16 @@ public class OandaAutoTrader implements Observer {
         this.fxpair = com.oanda.fxtrade.api.API.createFXPair("USD/JPY");
         
         //トレーリングストップの設定
-        TSL = 15.0;
+        TSL = 0.0;
         
         //全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
-        time = 60;//分を入れる 
+        time = 90;//分を入れる 
         sleepCount = (time * 60 * 1000);
         
         //ストラテジーの期間を設定
-        interval = TimeGetter.TIME1DAY;
+        interval = TimeGetter.TIME5MIN;
         signal = 9;
-        intM = 26;
+        intM = 25;
         intS = 12;
     }
 
