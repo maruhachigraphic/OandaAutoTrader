@@ -65,6 +65,11 @@ public class OandaAutoTrader implements Observer {
      * ストラテジーで取得した結果を代入する変数
      */
     public static volatile double[] strategyResult;
+    
+    /**
+     * 現在建てているトランザクションナンバー
+     */
+    public volatile long transactionNum;//現在建てている建玉のtransactionナンバーを取得
 
     /**
      * 購入後リリースするフラグ
@@ -104,12 +109,12 @@ public class OandaAutoTrader implements Observer {
         TSL = 0.0;
         
         //全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
-        time = 90;//分を入れる 
+        time = 600;//分を入れる（10時間） 
         sleepCount = (time * 60 * 1000);
         
         //ストラテジーの期間を設定
-        interval = TimeGetter.TIME5MIN;
-        signal = 9;
+        interval = TimeGetter.TIME1MIN;
+        signal = 8;
         intM = 25;
         intS = 12;
     }
@@ -139,7 +144,7 @@ public class OandaAutoTrader implements Observer {
                     executorFuture.execute(new Strategy_D_macd_plugin(thisClass, futureCall));//！！！！ここでストラテジーをnewする！！！！！！
                     //System.out.println("strategyResult =" + Arrays.toString(strategyResult));
 
-                }, 1, 30, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　30秒
+                }, 1, 15, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　15秒
 
         //ティッカークラスの呼び出し
         FXRateEvent ticker = new TickerD(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
@@ -156,6 +161,7 @@ public class OandaAutoTrader implements Observer {
         thisClass.roop();
 
         //終了
+        thisClass.orderClose();//取引中のポジションを手仕舞う
         System.out.println("終了前にtransactionリストを取得、保存");
         TransactionCheck transactoncheck = new TransactionCheck(thisClass);//新規にtransactioncheckのインスタンスを作成
         ArrayList<String> transactionArray = new ArrayList<>();
@@ -310,4 +316,10 @@ public class OandaAutoTrader implements Observer {
             }
         }
     }
+    
+    private void orderClose(){
+        SetOrder setorder = new SetOrder(this);
+        setorder.setRelease(transactionNum);
+    }
+    
 }

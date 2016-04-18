@@ -30,7 +30,7 @@ public class TickerD extends FXRateEvent {
     private volatile double currentBid;
     private volatile double[] SR;//OandaAutoTraderから引き抜いたstrategyResultを入れる
     private static boolean shortOrder, longOrder;//ショート注文フラグ・ロング注文フラグ
-    private volatile long transactionNum;//現在建てている建玉のtransactionナンバーを取得
+    //private volatile long transactionNum;//現在建てている建玉のtransactionナンバーを取得
     private volatile ArrayList<String> transactionArray;//transactionのArrayList
     private SetOrder setOrder;
 
@@ -88,8 +88,8 @@ public class TickerD extends FXRateEvent {
      * SR[0]ヒストグラム 　SR[1]シグナル　SR[2]MACD
      */
     public void localStrategy() {
-        System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
-        System.out.println("SR[2]MACD:" + SR[2] + " SR[1]シグナル:" + SR[1]+ " SR[0]ヒストグラム:" + SR[0]);
+        //System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
+        //System.out.println("SR[2]MACD:" + SR[2] + " SR[1]シグナル:" + SR[1]+ " SR[0]ヒストグラム:" + SR[0]);
         
         if ((currentAsk - currentBid) < 1) {//スプレッドが1以内であればtrue
 
@@ -101,27 +101,27 @@ public class TickerD extends FXRateEvent {
                 longOrder = true;//ロング注文フラグ発生
                 shortOrder = false;//ショート注文フラグを取り消し
 
-                if (transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
-                    setOrder.setRelease(transactionNum);
-                    transactionNum = 0;
+                if (oat.transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
+                    setOrder.setRelease(oat.transactionNum);
+                    oat.transactionNum = 0;
                 }
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
-                transactionNum = setOrder.setDealing(units);
+                oat.transactionNum = setOrder.setDealing(units);
             //this.transactionArray.add( this.transactoncheck.getTransaction() );//
 
             } else if (flagShortBuy && !shortOrder) {//もしflagShortBuyがtrue＆短期が現在値より上＆売り注文フラグがfalseなら
                 System.out.println((flagShortBuy && (SR[1] > currentBid)) + ":" + SR[1] + "売るぞ！");
                 longOrder = false;//ロング注文フラグを取り消し
                 shortOrder = true;//ショート注文フラグ発生
-                if (transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
-                    setOrder.setRelease(transactionNum);
-                    transactionNum = 0;
+                if (oat.transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
+                    setOrder.setRelease(oat.transactionNum);
+                    oat.transactionNum = 0;
                 }
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
-                transactionNum = setOrder.setDealing(-units);//-unitsで-100となりショート取引となる
+                oat.transactionNum = setOrder.setDealing(-units);//-unitsで-100となりショート取引となる
 
             } else {
-                System.out.println("ほっとくわ・・・");
+                System.out.println("様子見中・・・");
             }
         }//スプレッドが1を越えたら一旦戻すの終了
     }
