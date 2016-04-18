@@ -120,8 +120,6 @@ public class TickerD extends FXRateEvent {
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
                 oat.transactionNum = setOrder.setDealing(-units);//-unitsで-100となりショート取引となる
 
-            } else {
-                System.out.println("様子見中・・・");
             }
         }//スプレッドが1を越えたら一旦戻すの終了
     }
