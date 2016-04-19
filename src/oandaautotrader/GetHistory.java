@@ -81,7 +81,9 @@ public class GetHistory {
             //System.out.println(history.elementAt(i) + " (Current State)");
             //System.out.println(history.size() + " pointsを得られました。");
         }
-
+        
+        OAT.HiashiList = hiashiArrayListLocal;//OandaAutoTraderのHiashiListに代入
+        
         return hiashiArrayListLocal;
     }
 

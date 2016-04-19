@@ -25,6 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import strategy.Strategy_E_macDandP_plugin;
 
 /**
  * OANDA用の自動売買システム このクラスから始まります
@@ -36,7 +37,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * OandaAutoTraderのバージョンをStringで格納
      */
-    public static final String VERSION = "OandaAutoTrader ver0.42";
+    public static final String VERSION = "OandaAutoTrader ver0.44macp";
 
     // For keyboard input
     /**
@@ -65,6 +66,11 @@ public class OandaAutoTrader implements Observer {
      * ストラテジーで取得した結果を代入する変数
      */
     public static volatile double[] strategyResult;
+    
+    /**
+     *GetHistoryで取得する日足のリストを代入する変数
+     */
+    public static volatile ArrayList<String[]> HiashiList;
 
     /**
      * 現在建てているトランザクションナンバー
@@ -94,6 +100,11 @@ public class OandaAutoTrader implements Observer {
     public static int signal;
     public static int intM;
     public static int intS;
+    
+    /**
+     *MACPのスパン
+     */
+    public static int macpSpan;
 
     /**
      * コンストラクタ
@@ -109,7 +120,7 @@ public class OandaAutoTrader implements Observer {
         TSL = 0.0;
 
         //全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
-        time = 50;//分を入れる（10時間） 
+        time = 5;//分を入れる（10時間） 
         sleepCount = (time * 60 * 1000);
 
         //ストラテジーの期間を設定
@@ -117,6 +128,8 @@ public class OandaAutoTrader implements Observer {
         signal = 9;
         intM = 24;
         intS = 12;
+        
+        macpSpan = 24;
     }
 
     /**
@@ -141,13 +154,13 @@ public class OandaAutoTrader implements Observer {
                         strategyResult = result;
                         //System.out.println("Result =" + Arrays.toString(result));
                     });
-                    executorFuture.execute(new Strategy_D_macd_plugin(thisClass, futureCall));//！！！！ここでストラテジーをnewする！！！！！！
+                    executorFuture.execute(new Strategy_E_macDandP_plugin(thisClass, futureCall));//！！！！ここでストラテジーをnewする！！！！！！
                     //System.out.println("strategyResult =" + Arrays.toString(strategyResult));
 
                 }, 1, 15, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　15秒
 
         //ティッカークラスの呼び出し
-        FXRateEvent ticker = new TickerD(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
+        FXRateEvent ticker = new TickerE(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
         //getEventManager.add(FXEvent型)でFXEventを動作させる。何かイベントがあるごとに作動する。
         thisClass.rateTable.getEventManager().add(ticker);
 
