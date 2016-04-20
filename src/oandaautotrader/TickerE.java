@@ -94,10 +94,13 @@ public class TickerE extends FXRateEvent {
         System.out.println("MACP:" + macpPoint);
         boolean macpFlagLong = false;
         boolean macpFlagShort = false;
-        if (macpPoint < -6.8) {
+        //macpが-5.5より小さいか5.5より大きい場合はtrue
+        if (macpPoint <= -5.0 || macpPoint >= 5.0) {
             macpFlagLong = true;
-        } else if (macpPoint > 6.8) {
             macpFlagShort = true;
+        } else {
+            macpFlagLong = false;
+            macpFlagShort = false;
         }
         //System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
         //System.out.println("SR[2]MACD:" + SR[2] + " SR[1]シグナル:" + SR[1]+ " SR[0]ヒストグラム:" + SR[0]);

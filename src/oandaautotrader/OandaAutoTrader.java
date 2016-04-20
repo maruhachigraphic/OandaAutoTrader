@@ -37,7 +37,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * OandaAutoTraderのバージョンをStringで格納
      */
-    public static final String VERSION = "OandaAutoTrader ver0.44macp";
+    public static final String VERSION = "OandaAutoTrader ver0.45macp";
 
     // For keyboard input
     /**
@@ -94,9 +94,10 @@ public class OandaAutoTrader implements Observer {
     public final int sleepCount;
 
     /**
-     * 日足のインターバル、MACDシグナル、中長期間、短期期間
+     * 日足のインターバル（日足ごと、1分足ごと、など）、MACDシグナル、中長期間、短期期間
      */
     public static long interval;
+    public static int historyTerm;//日足の取得期間
     public static int signal;
     public static int intM;
     public static int intS;
@@ -120,10 +121,11 @@ public class OandaAutoTrader implements Observer {
         TSL = 0.0;
 
         //全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
-        time = 50;//分を入れる（10時間） 
+        time = 30;//分を入れる（30分） 
         sleepCount = (time * 60 * 1000);
 
         //ストラテジーの期間を設定
+        historyTerm = 48;//基本はintMの倍
         interval = TimeGetter.TIME1MIN;
         signal = 6;//デフォルト 9;
         intM = 22;//デフォルト 24;
