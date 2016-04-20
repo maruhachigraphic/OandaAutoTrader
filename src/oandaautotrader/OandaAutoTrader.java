@@ -125,11 +125,11 @@ public class OandaAutoTrader implements Observer {
 
         //ストラテジーの期間を設定
         interval = TimeGetter.TIME1MIN;
-        signal = 9;//デフォルト 9;
-        intM = 24;//デフォルト 24;
-        intS = 12;//デフォルト 12;
+        signal = 6;//デフォルト 9;
+        intM = 22;//デフォルト 24;
+        intS = 10;//デフォルト 12;
         
-        macpSpan = 24;
+        macpSpan = 44;
     }
 
     /**
