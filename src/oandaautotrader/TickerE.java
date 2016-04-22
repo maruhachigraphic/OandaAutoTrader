@@ -94,8 +94,8 @@ public class TickerE extends FXRateEvent {
         System.out.println("MACP:" + macpPoint);
         boolean macpFlagLong = false;
         boolean macpFlagShort = false;
-        //macpが-5.5より小さいか5.5より大きい場合はtrue
-        if (macpPoint <= -5.0 || macpPoint >= 5.0) {
+        //macpが-7.0より小さいか7.0より大きい場合はtrue
+        if (macpPoint <= -7.0 || macpPoint >= 7.0) {
             macpFlagLong = true;
             macpFlagShort = true;
         } else {

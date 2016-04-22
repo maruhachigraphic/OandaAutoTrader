@@ -121,17 +121,17 @@ public class OandaAutoTrader implements Observer {
         TSL = 0.0;
 
         //全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
-        time = 30;//分を入れる（30分） 
+        time = 120;//分を入れる（30分） 
         sleepCount = (time * 60 * 1000);
 
         //ストラテジーの期間を設定
         historyTerm = 48;//基本はintMの倍
         interval = TimeGetter.TIME1MIN;
-        signal = 6;//デフォルト 9;
-        intM = 22;//デフォルト 24;
-        intS = 10;//デフォルト 12;
+        signal = 9;//デフォルト 9;
+        intM = 24;//デフォルト 24;
+        intS = 12;//デフォルト 12;
         
-        macpSpan = 44;
+        macpSpan = 22;
     }
 
     /**
