@@ -117,21 +117,13 @@ public class OandaAutoTrader implements Observer {
         //FXPairの設定
         this.fxpair = com.oanda.fxtrade.api.API.createFXPair("USD/JPY");
 
-        //トレーリングストップの設定
-        TSL = 0.0;
 
         //全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
-        time = 120;//分を入れる（30分） 
         sleepCount = (time * 60 * 1000);
 
-        //ストラテジーの期間を設定
-        historyTerm = 48;//基本はintMの倍
+        //日足の取得期間を設定
         interval = TimeGetter.TIME1MIN;
-        signal = 9;//デフォルト 9;
-        intM = 24;//デフォルト 24;
-        intS = 12;//デフォルト 12;
-        
-        macpSpan = 22;
+
     }
 
     /**
@@ -325,6 +317,14 @@ public class OandaAutoTrader implements Observer {
             this.username = p.getProperty("UserName");
             this.password = p.getProperty("PassWord");
             this.accountID = Integer.parseInt(p.getProperty("AccountID"));
+            this.TSL = Double.parseDouble(p.getProperty("TSL"));
+            this.time = Integer.parseInt(p.getProperty("time"));
+            this.historyTerm = Integer.parseInt(p.getProperty("historyTerm"));
+            this.signal = Integer.parseInt(p.getProperty("signal"));
+            this.intM = Integer.parseInt(p.getProperty("intM"));
+            this.intS = Integer.parseInt(p.getProperty("intS"));
+            this.macpSpan = Integer.parseInt(p.getProperty("macpSpan"));
+            
         } catch (FileNotFoundException ex) {
             Logger.getLogger(OandaAutoTrader.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
