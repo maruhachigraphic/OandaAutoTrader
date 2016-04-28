@@ -106,7 +106,12 @@ public class OandaAutoTrader implements Observer {
      *MACPのスパン
      */
     public static int macpSpan;
-
+    
+    /**
+     *ティックの直近最高値安値を記録
+     */
+    public volatile double tickCounterHi;
+    public volatile double tickCounterLow;
     /**
      * コンストラクタ
      */
@@ -170,7 +175,7 @@ public class OandaAutoTrader implements Observer {
         //終了
         thisClass.orderClose();//取引中のポジションを手仕舞う
         System.out.println("終了前にtransactionリストを取得、保存");
-        TransactionCheck transactoncheck = new TransactionCheck(thisClass);//新規にtransactioncheckのインスタンスを作成
+        GetTransaction transactoncheck = new GetTransaction(thisClass);//新規にtransactioncheckのインスタンスを作成
         ArrayList<String> transactionArray = new ArrayList<>();
         transactionArray = transactoncheck.getAll();
         //transactionArray.stream().forEach((a) -> {System.out.println(a);});//トランザクションリストのプリント
