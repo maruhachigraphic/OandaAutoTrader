@@ -133,7 +133,7 @@ public class Strategy_E_macDandP_plugin extends StrategyTemplate implements Runn
 
         //("",0,0)はデフォルト値を入れている。日足を取得、継承元のhiashiArrayListにデータを格納
         //
-        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.interval, this.oandaAutoTrader.historyTerm);
+        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.interval, this.oandaAutoTrader.totalTicks);
         System.out.println("日足取得サイズ:" + hiashiArrayList.size());
         strategyData = strategy();
         //System.out.println("strategyData:" + Arrays.toString(strategyData));
