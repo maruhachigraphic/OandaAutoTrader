@@ -90,14 +90,16 @@ public class TickerE extends FXRateEvent {
      * SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
      */
     public void localStrategy() {
-        double macpPoint = macp.keisan(oat.HiashiList, currentAsk);
+        double currentBidAsk = (currentBid + currentAsk) /2;//BidとAskの中値
+        
+        double macpPoint = macp.keisan(oat.HiashiList, currentBidAsk);
         System.out.println("MACP:" + macpPoint);
         boolean macpFlagLong = false;
         boolean macpFlagShort = false;
 
         //macpが-4.0より小さいか4.0より大きい場合はtrue
-        macpFlagLong = (macpPoint <= -4.0 || macpPoint >= 4.0);
-        macpFlagShort = (macpPoint <= -4.0 || macpPoint >= 4.0);
+        macpFlagLong = (macpPoint <= -0.05 || macpPoint >= 0.05);
+        macpFlagShort = (macpPoint <= -0.05 || macpPoint >= 0.05);
 
 
         //System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
@@ -108,7 +110,7 @@ public class TickerE extends FXRateEvent {
             boolean flagShortBuy = ((SR[2] < SR[1]) && (SR[0] < 0));//MACD(SR[2])がシグナル(SR[1])より下ならショートフラグTRUE
 
             if (flagLongBuy && !longOrder && macpFlagLong) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
-                System.out.println((flagLongBuy && (SR[1] < currentAsk)) + ":" + SR[1] + "買うぞ！");
+                System.out.println((flagLongBuy && (SR[1] < currentBidAsk)) + ":" + SR[1] + "買うぞ！");
                 longOrder = true;//ロング注文フラグ発生
                 shortOrder = false;//ショート注文フラグを取り消し
                 checkTransaction();//トランザクションがあればリリース
@@ -118,7 +120,7 @@ public class TickerE extends FXRateEvent {
                 //this.transactionArray.add( this.transactoncheck.getTransaction() );//
 
             } else if (flagShortBuy && !shortOrder && macpFlagShort) {//もしflagShortBuyがtrue＆短期が現在値より上＆売り注文フラグがfalseなら
-                System.out.println((flagShortBuy && (SR[1] > currentBid)) + ":" + SR[1] + "売るぞ！");
+                System.out.println((flagShortBuy && (SR[1] > currentBidAsk)) + ":" + SR[1] + "売るぞ！");
                 longOrder = false;//ロング注文フラグを取り消し
                 shortOrder = true;//ショート注文フラグ発生
                 checkTransaction();//トランザクションがあればリリース
@@ -140,7 +142,7 @@ public class TickerE extends FXRateEvent {
 
     private void tickCount() {
         double answer;
-        //現在値>元高値であれば現在値をtickCounterHiに代入、0
+        //現在値>元高値であれば現在値をtickCounterHiに代入
         oat.tickCounterHi = ((oat.tickCounterHi > this.currentAsk) ? oat.tickCounterHi:this.currentAsk);
         oat.tickCounterLow =((oat.tickCounterLow < this.currentBid) ? oat.tickCounterLow:this.currentBid);
         
