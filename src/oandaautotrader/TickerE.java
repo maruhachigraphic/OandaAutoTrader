@@ -38,7 +38,7 @@ public class TickerE extends FXRateEvent {
     //建玉数
     private final long units;
 
-    private TransactionCheck transactoncheck;
+    private GetTransaction transactoncheck;
 
     private MACP macp;
 
@@ -59,7 +59,7 @@ public class TickerE extends FXRateEvent {
         this.units = 100;//ユニット数（建玉の数）
         this.transactionArray = new ArrayList<>();
 
-        this.transactoncheck = new TransactionCheck(OAT);
+        this.transactoncheck = new GetTransaction(OAT);
 
         this.macp = new MACP(oat.macpSpan);//MACPのインスタンス生成
 
@@ -94,17 +94,14 @@ public class TickerE extends FXRateEvent {
         System.out.println("MACP:" + macpPoint);
         boolean macpFlagLong = false;
         boolean macpFlagShort = false;
-        //macpが-7.0より小さいか7.0より大きい場合はtrue
-        if (macpPoint <= -2.0 || macpPoint >= 2.0) {
-            macpFlagLong = true;
-            macpFlagShort = true;
-        } else {
-            macpFlagLong = false;
-            macpFlagShort = false;
-        }
+
+        //macpが-4.0より小さいか4.0より大きい場合はtrue
+        macpFlagLong = (macpPoint <= -4.0 || macpPoint >= 4.0);
+        macpFlagShort = (macpPoint <= -4.0 || macpPoint >= 4.0);
+
+
         //System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
         //System.out.println("SR[2]MACD:" + SR[2] + " SR[1]シグナル:" + SR[1]+ " SR[0]ヒストグラム:" + SR[0]);
-
         if ((currentAsk - currentBid) < 1) {//スプレッドが1以内であればtrue
 
             boolean flagLongBuy = ((SR[2] > SR[1]) && (SR[0] > 0));//MACD(SR[2])がシグナル(SR[1])より上ならロングフラグTRUE
@@ -114,11 +111,8 @@ public class TickerE extends FXRateEvent {
                 System.out.println((flagLongBuy && (SR[1] < currentAsk)) + ":" + SR[1] + "買うぞ！");
                 longOrder = true;//ロング注文フラグ発生
                 shortOrder = false;//ショート注文フラグを取り消し
+                checkTransaction();//トランザクションがあればリリース
 
-                if (oat.transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
-                    setOrder.setRelease(oat.transactionNum);
-                    oat.transactionNum = 0;
-                }
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
                 oat.transactionNum = setOrder.setDealing(units);
                 //this.transactionArray.add( this.transactoncheck.getTransaction() );//
@@ -127,10 +121,8 @@ public class TickerE extends FXRateEvent {
                 System.out.println((flagShortBuy && (SR[1] > currentBid)) + ":" + SR[1] + "売るぞ！");
                 longOrder = false;//ロング注文フラグを取り消し
                 shortOrder = true;//ショート注文フラグ発生
-                if (oat.transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
-                    setOrder.setRelease(oat.transactionNum);
-                    oat.transactionNum = 0;
-                }
+                checkTransaction();//トランザクションがあればリリース
+
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
                 oat.transactionNum = setOrder.setDealing(-units);//-unitsで-100となりショート取引となる
 
@@ -138,4 +130,19 @@ public class TickerE extends FXRateEvent {
         }//スプレッドが1を越えたら一旦戻すの終了
     }
 
+    //トランザクションの有無でリリース
+    private void checkTransaction() {
+        if (oat.transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
+            setOrder.setRelease(oat.transactionNum);
+            oat.transactionNum = 0;
+        }
+    }
+
+    private void tickCount() {
+        double answer;
+        //現在値>元高値であれば現在値をtickCounterHiに代入、0
+        oat.tickCounterHi = ((oat.tickCounterHi > this.currentAsk) ? oat.tickCounterHi:this.currentAsk);
+        oat.tickCounterLow =((oat.tickCounterLow < this.currentBid) ? oat.tickCounterLow:this.currentBid);
+        
+    }
 }

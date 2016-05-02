@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author maruhachi
  */
-public class TransactionCheck {
+public class GetTransaction {
 
     private final OandaAutoTrader OAT;
     private final FXPair pair;
@@ -29,7 +29,7 @@ public class TransactionCheck {
     private ArrayList<String> transactionArray;
             
             
-    TransactionCheck(OandaAutoTrader OAT) {
+    GetTransaction(OandaAutoTrader OAT) {
         this.OAT = OAT;
         this.pair = OAT.fxpair;
         this.fxclient = OAT.fxclient;
@@ -60,7 +60,7 @@ public class TransactionCheck {
         try {
             transactionVector = account.getTransactions();
         } catch (AccountException ex) {
-            Logger.getLogger(TransactionCheck.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GetTransaction.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.transactionArray.add("timestamp"+","+"transactionNum"+","+ "type" + "," + "pair" + "," + 
                    "購入金額" + "," + "資産合計" + "," + "amount");

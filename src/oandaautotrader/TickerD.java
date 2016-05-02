@@ -37,7 +37,7 @@ public class TickerD extends FXRateEvent {
     //建玉数
     private final long units;
 
-    private TransactionCheck transactoncheck;
+    private GetTransaction transactoncheck;
 
     /**
      * コンストラクタ
@@ -56,7 +56,7 @@ public class TickerD extends FXRateEvent {
         this.units = 100;//ユニット数（建玉の数）
         this.transactionArray = new ArrayList<>();
 
-        this.transactoncheck = new TransactionCheck(OAT);
+        this.transactoncheck = new GetTransaction(OAT);
         //marketOrder = marketorder;
         //delta = ;
         //watchingBuyOrder = (marketOrder.getUnits() > 0);//発注量が0より大きかったらtrue
