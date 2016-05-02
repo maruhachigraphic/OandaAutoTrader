@@ -90,7 +90,7 @@ public class TickerE extends FXRateEvent {
      * SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
      */
     public void localStrategy() {
-        double currentBidAsk = (currentBid + currentAsk) /2;//BidとAskの中値
+        double currentBidAsk = (currentBid + currentAsk) /2.0;//BidとAskの中値
         
         double macpPoint = macp.keisan(oat.HiashiList, currentBidAsk);
         System.out.println("MACP:" + macpPoint);
