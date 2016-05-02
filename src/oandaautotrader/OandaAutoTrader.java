@@ -156,7 +156,7 @@ public class OandaAutoTrader implements Observer {
                     executorFuture.execute(new Strategy_E_macDandP_plugin(thisClass, futureCall));//！！！！ここでストラテジーをnewする！！！！！！
                     //System.out.println("strategyResult =" + Arrays.toString(strategyResult));
 
-                }, 1, 15, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　15秒
+                }, 1, 10, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　10秒
 
         //ティッカークラスの呼び出し
         FXRateEvent ticker = new TickerE(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
