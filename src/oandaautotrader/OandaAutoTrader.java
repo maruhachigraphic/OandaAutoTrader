@@ -97,7 +97,7 @@ public class OandaAutoTrader implements Observer {
      * 日足のインターバル（日足ごと、1分足ごと、など）、MACDシグナル、中長期間、短期期間
      */
     public static long interval;
-    public static int historyTerm;//日足の取得期間
+    public static int historyTickTerm;//日足の取得期間
     public static int signal;
     public static int intM;
     public static int intS;
@@ -319,7 +319,7 @@ public class OandaAutoTrader implements Observer {
             this.accountID = Integer.parseInt(p.getProperty("AccountID"));
             this.TSL = Double.parseDouble(p.getProperty("TSL"));
             this.time = Integer.parseInt(p.getProperty("time"));
-            this.historyTerm = Integer.parseInt(p.getProperty("historyTerm"));
+            this.historyTickTerm = Integer.parseInt(p.getProperty("historyTickTerm"));
             this.signal = Integer.parseInt(p.getProperty("signal"));
             this.intM = Integer.parseInt(p.getProperty("intM"));
             this.intS = Integer.parseInt(p.getProperty("intS"));

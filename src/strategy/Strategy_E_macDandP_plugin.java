@@ -131,9 +131,9 @@ public class Strategy_E_macDandP_plugin extends StrategyTemplate implements Runn
             Logger.getLogger(Strategy_E_macDandP_plugin.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        //("",0,0)はデフォルト値を入れている。日足を取得、継承元のhiashiArrayListにデータを格納
-        //
-        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.interval, this.oandaAutoTrader.historyTerm);
+        //getHiashiList("",0,0)でデフォルト値。日足を取得、継承元のhiashiArrayListにデータを格納。
+        //(fxpair,インターバル,ティック数)
+        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.interval, this.oandaAutoTrader.historyTickTerm);
         System.out.println("日足取得サイズ:" + hiashiArrayList.size());
         strategyData = strategy();
         //System.out.println("strategyData:" + Arrays.toString(strategyData));

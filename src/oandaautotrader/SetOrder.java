@@ -78,16 +78,16 @@ public class SetOrder {
 
             MarketOrder marketOrder = account.getTradeWithId(transactionNum);//closeさせるために、transactionNumをMarketOrder型に変換
 
-            System.out.println("Example: closing market order " + transactionNum + "...");
+            System.out.println("OAT: closing market order " + transactionNum + "...");
 
             // submit the market order close request//クローズ命令の送信
             account.close(marketOrder);
             System.out.println(transactionNum + "のクローズ");
 
         } catch (SessionException se) {
-            System.err.println("Example: market order close failed: " + se);
+            System.err.println("OAT: market order close failed: " + se);
         } catch (Exception e) {
-            System.err.println("Example: market order close failed: " + e);
+            System.err.println("OAT: market order close failed: " + e);
         }
     }
 }
