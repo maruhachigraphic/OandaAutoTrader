@@ -15,6 +15,7 @@ import oandaautotrader.OandaAutoTrader;
  */
 public abstract class StrategyTemplate {
     ArrayList<String[]> hiashiArrayList;
+    ArrayList<String[]> hiashiArrayListB;
     /**
      * 単一フラグ
      */

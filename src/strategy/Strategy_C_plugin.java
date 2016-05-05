@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import oandaautotrader.GetHistory;
+import oandaautotrader.GetHistoryArray;
 import oandaautotrader.OandaAutoTrader;
 import oandaautotrader.TimeGetter;
 
@@ -131,8 +131,8 @@ public class Strategy_C_plugin extends StrategyTemplate implements Runnable {
             ticks = 100; // default to 100 ticks
         }
 
-        GetHistory gethistory = new GetHistory();
-        hiashiArrayListLocal = gethistory.getHistory(oandaAutoTrader, rateTable, interval, ticks);
+        GetHistoryArray gethistory = new GetHistoryArray();
+        hiashiArrayListLocal = gethistory.getHistoryArray(oandaAutoTrader, rateTable, interval, ticks);
 
         return hiashiArrayListLocal;
     }

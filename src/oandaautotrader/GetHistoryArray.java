@@ -19,7 +19,7 @@ import java.util.Vector;
  *
  * @author maruhachi
  */
-public class GetHistory {
+public class GetHistoryArray {
 
     /**
      *
@@ -29,8 +29,8 @@ public class GetHistory {
      * @param tick_history 呼び出し元からtick数を取得する
      * @return ArrayList＜String[]＞型で返す String[]の中身は[unixtime:open:max:min:close]
      */
-    //public ArrayList<String[]> getHistory(FXClient fxclient, RateTable rateTable, FXPair fxpair, long interval_history, int tick_history) {
-    public ArrayList<String[]> getHistory(OandaAutoTrader OAT, RateTable rateTable, long interval_history, int tick_history) {
+    //public ArrayList<String[]> getHistoryArray(FXClient fxclient, RateTable rateTable, FXPair fxpair, long interval_history, int tick_history) {
+    public ArrayList<String[]> getHistoryArray(OandaAutoTrader OAT, RateTable rateTable, long interval_history, int tick_history) {
         FXClient fxclient = OAT.fxclient;
         FXPair fxpair = OAT.fxpair;
         //このクラスのフィールドhiashiArrayListに代入するため、ローカルなインスタンスを準備
@@ -45,7 +45,7 @@ public class GetHistory {
         //System.out.println("OandaAutoTrader: rate history request...");
         Vector<? extends FXHistoryPoint> history = null;
         try {
-            //history = fxclient.getHistory(pair, interval, ticks); // this call has been deprecated
+            //history = fxclient.getHistoryArray(pair, tickInterval, ticks); // this call has been deprecated
             //！！！！！注）rateTableはinitメソッドから取得している　！！！！！
             history = rateTable.getHistory(fxpair, interval_history, tick_history);
         } catch (OAException se) {
@@ -82,7 +82,7 @@ public class GetHistory {
             //System.out.println(history.size() + " pointsを得られました。");
         }
         
-        OAT.HiashiList = hiashiArrayListLocal;//OandaAutoTraderのHiashiListに代入
+        //OAT.HiashiList = hiashiArrayListLocal;//OandaAutoTraderのHiashiListに代入
         
         return hiashiArrayListLocal;
     }

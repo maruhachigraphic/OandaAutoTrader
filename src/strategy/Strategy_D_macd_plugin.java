@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import oandaautotrader.GetHistory;
+import oandaautotrader.GetHistoryArray;
 import oandaautotrader.OandaAutoTrader;
 import oandaautotrader.TimeGetter;
 
@@ -118,8 +118,8 @@ public class Strategy_D_macd_plugin extends StrategyTemplate implements Runnable
             ticks = 100; // default to 100 ticks
         }
 
-        GetHistory gethistory = new GetHistory();
-        hiashiArrayListLocal = gethistory.getHistory(oandaAutoTrader, rateTable, interval_local, ticks);
+        GetHistoryArray gethistory = new GetHistoryArray();
+        hiashiArrayListLocal = gethistory.getHistoryArray(oandaAutoTrader, rateTable, interval_local, ticks);
 
         return hiashiArrayListLocal;
     }
@@ -133,7 +133,7 @@ public class Strategy_D_macd_plugin extends StrategyTemplate implements Runnable
         }
 
         //("",0,0)はデフォルト値を入れている。日足を取得、継承元のhiashiArrayListにデータを格納
-        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.interval, intM*2);
+        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.tickInterval, intM*2);
         System.out.println("日足取得サイズ:" + hiashiArrayList.size());
         strategyData = strategy();
         //System.out.println("strategyData:" + Arrays.toString(strategyData));

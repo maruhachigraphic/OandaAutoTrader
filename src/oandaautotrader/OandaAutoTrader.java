@@ -66,11 +66,13 @@ public class OandaAutoTrader implements Observer {
      * ストラテジーで取得した結果を代入する変数
      */
     public static volatile double[] strategyResult;
+    public static volatile double[] strategyResultB;
     
     /**
      *GetHistoryで取得する日足のリストを代入する変数
      */
     public static volatile ArrayList<String[]> HiashiList;
+    public static volatile ArrayList<String[]> HiashiListB;
 
     /**
      * 現在建てているトランザクションナンバー
@@ -96,7 +98,8 @@ public class OandaAutoTrader implements Observer {
     /**
      * 日足のインターバル（日足ごと、1分足ごと、など）、MACDシグナル、中長期間、短期期間
      */
-    public static long interval;
+    public static long tickInterval;
+    public static long tickIntervalB;
     public static int historyTickTerm;//日足の取得期間
     public static int signal;
     public static int intM;
@@ -127,7 +130,8 @@ public class OandaAutoTrader implements Observer {
         sleepCount = (time * 60 * 1000);
 
         //日足の取得期間を設定
-        interval = TimeGetter.TIME1MIN;
+        tickInterval = TimeGetter.TIME1MIN;
+        tickIntervalB = TimeGetter.TIME5MIN;
 
     }
 

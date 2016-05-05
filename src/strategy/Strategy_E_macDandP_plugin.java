@@ -12,11 +12,12 @@ import com.oanda.fxtrade.api.FXPair;
 import com.oanda.fxtrade.api.RateTable;
 import com.oanda.fxtrade.api.SessionDisconnectedException;
 import indicators.MACD;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import oandaautotrader.GetHistory;
+import oandaautotrader.GetHistoryArray;
 import oandaautotrader.OandaAutoTrader;
 import oandaautotrader.TimeGetter;
 
@@ -32,7 +33,8 @@ public class Strategy_E_macDandP_plugin extends StrategyTemplate implements Runn
     private final FXPair fxpair;
     private final Account account;
     private RateTable rateTable;
-    double[] strategyData;
+    double[] strategyResult;
+    double[] strategyResultB;
 
     /**
      * ストラテジーの期間
@@ -57,17 +59,24 @@ public class Strategy_E_macDandP_plugin extends StrategyTemplate implements Runn
         this.signal = OAT.signal;
         this.intM = OAT.intM;
         this.intS = OAT.intS;
+        this.strategyResult = OAT.strategyResult;
+        this.strategyResultB = OAT.strategyResultB;
     }
 
 
     double[] strategy() {
         MACD macd = new MACD(hiashiArrayList,intS,intM,signal);
-        double[] CP = new double[3];
+        MACD macdB = new MACD(hiashiArrayListB,intS,intM,signal);
+        double[] CP = new double[6];
         //MACDの最新一つだけを取得して代入する
         CP[0] = macd.macdHistgram.get(macd.macdHistgram.size()-1);//MACDヒストグラム
         CP[1] = macd.macdSignal.get(macd.macdSignal.size()-1);//シグナル
         CP[2] = macd.macdList.get(macd.macdList.size()-1);//MACD
-        //System.out.println("cp0"+macd.macdHistgram.get(macd.macdHistgram.size()-1));
+        CP[3] = macdB.macdHistgram.get(macd.macdHistgram.size()-1);//MACDヒストグラム
+        CP[4] = macdB.macdSignal.get(macd.macdSignal.size()-1);//シグナル
+        CP[5] = macdB.macdList.get(macd.macdList.size()-1);//MACD
+        
+        for(double a:CP){System.out.println(a);}
         return CP;//double[]型、0ヒストグラム・1シグナル・2MACDの値を返す
     }
 
@@ -117,8 +126,8 @@ public class Strategy_E_macDandP_plugin extends StrategyTemplate implements Runn
             ticks = 100; // default to 100 ticks
         }
 
-        GetHistory gethistory = new GetHistory();
-        hiashiArrayListLocal = gethistory.getHistory(oandaAutoTrader, rateTable, interval_local, ticks);
+        GetHistoryArray gethistoryarray = new GetHistoryArray();
+        hiashiArrayListLocal = gethistoryarray.getHistoryArray(oandaAutoTrader, rateTable, interval_local, ticks);
 
         return hiashiArrayListLocal;
     }
@@ -133,10 +142,12 @@ public class Strategy_E_macDandP_plugin extends StrategyTemplate implements Runn
 
         //getHiashiList("",0,0)でデフォルト値。日足を取得、継承元のhiashiArrayListにデータを格納。
         //(fxpair,インターバル,ティック数)
-        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.interval, this.oandaAutoTrader.historyTickTerm);
-        System.out.println("日足取得サイズ:" + hiashiArrayList.size());
-        strategyData = strategy();
-        //System.out.println("strategyData:" + Arrays.toString(strategyData));
-        future.complete(strategyData);//ここに最終的な値を入れる
+        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.tickInterval, this.oandaAutoTrader.historyTickTerm);
+        hiashiArrayListB = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.tickIntervalB, this.oandaAutoTrader.historyTickTerm);
+        
+        strategyResult = strategy();
+        
+        //System.out.println("strategyResult:" + Arrays.toString(strategyResult));
+future.complete(strategyResult);//ここに最終的な値を入れる
     }
 }

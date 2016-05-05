@@ -92,14 +92,14 @@ public class TickerE extends FXRateEvent {
     public void localStrategy() {
         double currentBidAsk = (currentBid + currentAsk) /2.0;//BidとAskの中値
         
-        double macpPoint = macp.keisan(oat.HiashiList, currentBidAsk);
-        System.out.println("MACP:" + macpPoint);
-        boolean macpFlagLong = false;
-        boolean macpFlagShort = false;
+        //double macpPoint = macp.keisan(oat.HiashiList, currentBidAsk);
+        //System.out.println("MACP:" + macpPoint);
+        //boolean macpFlagLong = false;
+        //boolean macpFlagShort = false;
 
         //macpが-4.0より小さいか4.0より大きい場合はtrue
-        macpFlagLong = (macpPoint <= -0.05 || macpPoint >= 0.05);
-        macpFlagShort = (macpPoint <= -0.05 || macpPoint >= 0.05);
+        //macpFlagLong = (macpPoint <= -0.05 || macpPoint >= 0.05);
+        //macpFlagShort = (macpPoint <= -0.05 || macpPoint >= 0.05);
 
 
         //System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
@@ -109,7 +109,7 @@ public class TickerE extends FXRateEvent {
             boolean flagLongBuy = ((SR[2] > SR[1]) && (SR[0] > 0));//MACD(SR[2])がシグナル(SR[1])より上ならロングフラグTRUE
             boolean flagShortBuy = ((SR[2] < SR[1]) && (SR[0] < 0));//MACD(SR[2])がシグナル(SR[1])より下ならショートフラグTRUE
 
-            if (flagLongBuy && !longOrder && macpFlagLong) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
+            if (flagLongBuy && !longOrder) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
                 System.out.println((flagLongBuy && (SR[1] < currentBidAsk)) + ":" + SR[1] + "買うぞ！");
                 longOrder = true;//ロング注文フラグ発生
                 shortOrder = false;//ショート注文フラグを取り消し
@@ -119,7 +119,7 @@ public class TickerE extends FXRateEvent {
                 oat.transactionNum = setOrder.setDealing(units);
                 //this.transactionArray.add( this.transactoncheck.getTransaction() );//
 
-            } else if (flagShortBuy && !shortOrder && macpFlagShort) {//もしflagShortBuyがtrue＆短期が現在値より上＆売り注文フラグがfalseなら
+            } else if (flagShortBuy && !shortOrder) {//もしflagShortBuyがtrue＆短期が現在値より上＆売り注文フラグがfalseなら
                 System.out.println((flagShortBuy && (SR[1] > currentBidAsk)) + ":" + SR[1] + "売るぞ！");
                 longOrder = false;//ロング注文フラグを取り消し
                 shortOrder = true;//ショート注文フラグ発生
