@@ -42,6 +42,10 @@ public class TickerE extends FXRateEvent {
 
     private MACP macp;
 
+    private double currentBidAsk;
+
+    private long currentUnits;//現在保有している建玉
+
     /**
      * コンストラクタ
      *
@@ -90,61 +94,69 @@ public class TickerE extends FXRateEvent {
      * SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
      */
     public void localStrategy() {
-        double currentBidAsk = (currentBid + currentAsk) /2.0;//BidとAskの中値
-        
-        //double macpPoint = macp.keisan(oat.HiashiList, currentBidAsk);
-        //System.out.println("MACP:" + macpPoint);
-        //boolean macpFlagLong = false;
-        //boolean macpFlagShort = false;
+        this.currentBidAsk = (currentBid + currentAsk) / 2.0;//BidとAskの中値
+        if (this.currentUnits == 0) {
+            setbuy();
+            System.out.println("currentUnits:"+this.currentUnits);
+        }else if(this.currentUnits > 0){
+            setRelease();
+        }
+    }
 
-        //macpが-4.0より小さいか4.0より大きい場合はtrue
-        //macpFlagLong = (macpPoint <= -0.05 || macpPoint >= 0.05);
-        //macpFlagShort = (macpPoint <= -0.05 || macpPoint >= 0.05);
-
-
-        //System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
+    private void setbuy() {
         //System.out.println("SR[2]MACD:" + SR[2] + " SR[1]シグナル:" + SR[1]+ " SR[0]ヒストグラム:" + SR[0]);
+        //SR[5]=MACD長期 SR[4]=シグナル長期 SR[3]=ヒストグラム長期 
         if ((currentAsk - currentBid) < 1) {//スプレッドが1以内であればtrue
 
             boolean flagLongBuy = ((SR[2] > SR[1]) && (SR[0] > 0));//MACD(SR[2])がシグナル(SR[1])より上ならロングフラグTRUE
             boolean flagShortBuy = ((SR[2] < SR[1]) && (SR[0] < 0));//MACD(SR[2])がシグナル(SR[1])より下ならショートフラグTRUE
 
             if (flagLongBuy && !longOrder) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
-                System.out.println((flagLongBuy && (SR[1] < currentBidAsk)) + ":" + SR[1] + "買うぞ！");
+                System.out.println((flagLongBuy && (SR[1] < this.currentBidAsk)) + ":" + SR[1] + "買うぞ！");
                 longOrder = true;//ロング注文フラグ発生
                 shortOrder = false;//ショート注文フラグを取り消し
-                checkTransaction();//トランザクションがあればリリース
+                releaseTransaction();//トランザクションがあればリリース
 
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
                 oat.transactionNum = setOrder.setDealing(units);
+                this.currentUnits = setOrder.getUnits(oat.transactionNum);
                 //this.transactionArray.add( this.transactoncheck.getTransaction() );//
-
-            } else if (flagShortBuy && !shortOrder) {//もしflagShortBuyがtrue＆短期が現在値より上＆売り注文フラグがfalseなら
-                System.out.println((flagShortBuy && (SR[1] > currentBidAsk)) + ":" + SR[1] + "売るぞ！");
-                longOrder = false;//ロング注文フラグを取り消し
-                shortOrder = true;//ショート注文フラグ発生
-                checkTransaction();//トランザクションがあればリリース
-
-                //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
-                oat.transactionNum = setOrder.setDealing(-units);//-unitsで-100となりショート取引となる
-
             }
         }//スプレッドが1を越えたら一旦戻すの終了
     }
-
+    /**
+     * リリースするためのストラテジー
+     * 5分足のMACDで判断する
+     */
+    private void setRelease(){
+        if((currentAsk - currentBid) < 1){
+            //MACD(SR[5])がシグナル(SR[4])より下、ヒストグラムSR[3]が0より下ならflagRerase=true
+            System.out.println("ヒストグラム:"+SR[3]+" シグナル:"+SR[4]+" MACD:"+SR[5]);
+            boolean flagRelease = ((SR[5] < SR[4]) && (SR[3] < 0));
+            //
+            //作業中*********************************************
+            //
+            if (flagRelease){
+                System.out.println("手仕舞いします！:" + oat.transactionNum);
+                releaseTransaction();
+                longOrder = false;
+            }
+        }
+    }
     //トランザクションの有無でリリース
-    private void checkTransaction() {
+    private void releaseTransaction() {
         if (oat.transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
             setOrder.setRelease(oat.transactionNum);
             oat.transactionNum = 0;
+            this.currentUnits = 0;
         }
     }
 
     private void tickCount() {
         double answer;
         //現在値>元高値であれば現在値をtickCounterHiに代入
-        oat.tickCounterHi = ((oat.tickCounterHi > this.currentAsk) ? oat.tickCounterHi:this.currentAsk);
-        oat.tickCounterLow =((oat.tickCounterLow < this.currentBid) ? oat.tickCounterLow:this.currentBid);
-        
+        oat.tickCounterHi = ((oat.tickCounterHi > this.currentAsk) ? oat.tickCounterHi : this.currentAsk);
+        oat.tickCounterLow = ((oat.tickCounterLow < this.currentBid) ? oat.tickCounterLow : this.currentBid);
+
     }
 }

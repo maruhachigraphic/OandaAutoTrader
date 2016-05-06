@@ -76,7 +76,7 @@ public class Strategy_E_macDandP_plugin extends StrategyTemplate implements Runn
         CP[4] = macdB.macdSignal.get(macd.macdSignal.size()-1);//シグナル
         CP[5] = macdB.macdList.get(macd.macdList.size()-1);//MACD
         
-        for(double a:CP){System.out.println(a);}
+        //for(double a:CP){System.out.println(a);}
         return CP;//double[]型、0ヒストグラム・1シグナル・2MACDの値を返す
     }
 

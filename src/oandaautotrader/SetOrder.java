@@ -7,6 +7,7 @@ package oandaautotrader;
 
 import com.oanda.fxtrade.api.API;
 import com.oanda.fxtrade.api.Account;
+import com.oanda.fxtrade.api.AccountException;
 import com.oanda.fxtrade.api.FXClient;
 import com.oanda.fxtrade.api.FXPair;
 import com.oanda.fxtrade.api.MarketOrder;
@@ -14,21 +15,26 @@ import com.oanda.fxtrade.api.OAException;
 import com.oanda.fxtrade.api.SessionException;
 import com.oanda.fxtrade.api.StopLossOrder;
 import com.oanda.fxtrade.api.Transaction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *売買オーダーを発生させます。
- * new SetOrder(OandaAutoTrader型);で準備をしておき、setDealing/setReleaseで実取引をします。
+ * 売買オーダーを発生させます。 new
+ * SetOrder(OandaAutoTrader型);で準備をしておき、setDealing/setReleaseで実取引をします。
+ *
  * @author kimuratadashi
  */
 public class SetOrder {
+
     Account account;
     private final FXClient fxclient;
     private final FXPair fxpair;
     private double tsl;//トレーリングストップロスのpips値
     private final OandaAutoTrader oat;
     public long transactionNum;
-    
-    SetOrder(OandaAutoTrader oat){//OandaAutoTrader型を受け取り、中身のフィールド値を取得する。
+    public long units;
+
+    SetOrder(OandaAutoTrader oat) {//OandaAutoTrader型を受け取り、中身のフィールド値を取得する。
         this.account = oat.account;
         this.fxclient = oat.fxclient;
         this.fxpair = oat.fxpair;
@@ -37,13 +43,13 @@ public class SetOrder {
     }
 
     /**
-     *呼び出すとディーリング開始
-     * 
+     * 呼び出すとディーリング開始
+     *
      * @param units 建玉数を入力、マイナス値でショートになる
      * @return トランザクションナンバーをlongで取得
      */
-    public long setDealing(long units){//units量を設定
-            //APIクラスは新規インスタンスを作るためのクラス。
+    public long setDealing(long units) {//units量を設定
+        //APIクラスは新規インスタンスを作るためのクラス。
         MarketOrder order = API.createMarketOrder();//新たにMarketOrder（注文）のインスタンスを作成
         order.setPair(this.fxpair);//orderにペアを代入
         order.setUnits(units);//orderに取引量(units)を代入
@@ -63,10 +69,11 @@ public class SetOrder {
 
     /**
      * オーダーした建玉を手仕舞う。トランザクションナンバーで建玉を選別
+     *
      * @param transactionNum long値でトランザクションNo.を入力
      */
-    public void setRelease(long transactionNum){
-    try {
+    public void setRelease(long transactionNum) {
+        try {
             if (!fxclient.isLoggedIn()) {
                 return;
             }
@@ -89,5 +96,16 @@ public class SetOrder {
         } catch (Exception e) {
             System.err.println("OAT: market order close failed: " + e);
         }
+    }
+
+    public long getUnits(long transactionNum) {
+        long units1 = 0;
+        try {
+            MarketOrder marketOrder = account.getTradeWithId(transactionNum);
+            units1 = marketOrder.getUnits();
+        } catch (AccountException ex) {
+            Logger.getLogger(SetOrder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return units1;
     }
 }
