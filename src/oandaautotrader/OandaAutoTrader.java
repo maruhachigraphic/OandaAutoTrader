@@ -240,9 +240,10 @@ public class OandaAutoTrader implements Observer {
             Logger.getLogger(OandaAutoTrader.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        System.out.println("なんか押すと始まる！");
-        String name = new java.util.Scanner(System.in).nextLine();
-        System.out.println("おけ！");
+        //System.out.println("なんか押すと始まる！");
+        //String name = new java.util.Scanner(System.in).nextLine();
+        //System.out.println("おけ！");
+        
         /*
          Thread menuThread = new Thread("Example.menuThread") {
          @Override
