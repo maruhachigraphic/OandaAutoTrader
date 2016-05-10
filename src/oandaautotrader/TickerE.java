@@ -121,14 +121,14 @@ public class TickerE extends FXRateEvent {
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
                 oat.transactionNum = setOrder.setDealing(units);
                 this.currentUnits = setOrder.getUnits(oat.transactionNum);
-                setOrder.editStopLoss(oat.transactionNum);
+                setOrder.setStopLoss(oat.transactionNum);//ストップロスの設定
                 //this.transactionArray.add( this.transactoncheck.getTransaction() );//
             }
         }//スプレッドが1を越えたら一旦戻すの終了
     }
     /**
      * リリースするためのストラテジー
-     * 5分足のMACDで判断する
+     * 1分足のMACDで判断する
      */
     private void setRelease(){
         if((currentAsk - currentBid) < 1){

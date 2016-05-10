@@ -108,9 +108,11 @@ public class SetOrder {
         }
         return units1;
     }
-    
-    public void editStopLoss(long transactionNum){
-        StopLossOrder stopLO = null ;
+    /**
+    *ストップロスのセット
+     * @param transactionNum 直近のトランザクションナンバー
+    */
+    public void setStopLoss(long transactionNum){
         try {
             MarketOrder marketOrder = account.getTradeWithId(transactionNum);
             double currentprice = marketOrder.getPrice();
