@@ -108,4 +108,20 @@ public class SetOrder {
         }
         return units1;
     }
+    
+    public void editStopLoss(long transactionNum){
+        StopLossOrder stopLO = null ;
+        try {
+            MarketOrder marketOrder = account.getTradeWithId(transactionNum);
+            double currentprice = marketOrder.getPrice();
+            System.out.println("getPrice:"+ currentprice);
+            marketOrder.getStopLoss().setPrice(currentprice - 0.03);           
+            this.account.modify(marketOrder);
+            System.out.println("ストップロス:" + marketOrder.getStopLoss());
+        } catch (AccountException ex) {
+            Logger.getLogger(SetOrder.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (OAException ex) {
+            Logger.getLogger(SetOrder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
