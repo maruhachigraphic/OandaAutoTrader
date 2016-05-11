@@ -29,6 +29,7 @@ public class TickerE extends FXRateEvent {
     //private boolean watchingBuyOrder;
     private volatile double currentAsk;
     private volatile double currentBid;
+    private volatile double currentBidAsk;
     private volatile double[] SR;//OandaAutoTraderから引き抜いたstrategyResultを入れる
     private static boolean shortOrder, longOrder;//ショート注文フラグ・ロング注文フラグ
     //private volatile long transactionNum;//現在建てている建玉のtransactionナンバーを取得
@@ -42,9 +43,11 @@ public class TickerE extends FXRateEvent {
 
     private MACP macp;
 
-    private double currentBidAsk;
+    private boolean stoplossFlag;
 
     private long currentUnits;//現在保有している建玉
+
+    private ArrayList<Double> memoryMacdSignal;//MACDシグナルを保管
 
     /**
      * コンストラクタ
@@ -66,7 +69,8 @@ public class TickerE extends FXRateEvent {
         this.transactoncheck = new GetTransaction(OAT);
 
         this.macp = new MACP(oat.macpSpan);//MACPのインスタンス生成
-
+        this.memoryMacdSignal = new ArrayList<>();//MACDシグナルの保存用ArrayListを生成
+        this.stoplossFlag = false;
         setTransient(false);//FXRateEventのメソッド。このイベントは一時的であるかどうかを設定します（一度だけ呼び出し、そのハンドルメソッドを持つことになります）。
     }
 
@@ -85,6 +89,9 @@ public class TickerE extends FXRateEvent {
         this.currentBid = REI.getTick().getBid();
         //System.out.println("TickerからstrategyResult" + Arrays.toString(OandaAutoTrader.strategyResult));
         this.SR = this.oat.strategyResult;//ストラテジーからのデータを取得
+        //MACDシグナルを記録
+        memoryMacdSignal.add(SR[0]);
+        //System.out.println(memoryMacdSignal.get(memoryMacdSignal.size() - 1));
         localStrategy();//ローカルなストラテジーを作動させる
     }
 
@@ -94,12 +101,14 @@ public class TickerE extends FXRateEvent {
      * SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
      */
     public void localStrategy() {
+
         this.currentBidAsk = (currentBid + currentAsk) / 2.0;//BidとAskの中値
         if (this.currentUnits == 0) {
-            setbuy();          
-        }else if(this.currentUnits > 0){
-            System.out.println("currentUnits:"+this.currentUnits);
+            setbuy();
+        } else if (this.currentUnits > 0) {
+            //System.out.println("currentUnits:" + this.currentUnits); 
             setRelease();
+            modifyStopLoss(0.02);//ストップロスの修正
         }
     }
 
@@ -113,7 +122,7 @@ public class TickerE extends FXRateEvent {
             boolean flagShortBuy = ((SR[2] < SR[1]) && (SR[0] < 0));//MACD(SR[2])がシグナル(SR[1])より下ならショートフラグTRUE
 
             if (flagLongBuy && !longOrder) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
-                System.out.println( "！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
+                System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
                 longOrder = true;//ロング注文フラグ発生
                 shortOrder = false;//ショート注文フラグを取り消し
                 releaseTransaction();//トランザクションがあればリリース
@@ -121,31 +130,34 @@ public class TickerE extends FXRateEvent {
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
                 oat.transactionNum = setOrder.setDealing(units);
                 this.currentUnits = setOrder.getUnits(oat.transactionNum);
-                setOrder.setStopLoss(oat.transactionNum);//ストップロスの設定
+                setOrder.setStopLoss(oat.transactionNum, (-0.03));//ストップロスの設定
+                this.stoplossFlag = true;
                 //this.transactionArray.add( this.transactoncheck.getTransaction() );//
             }
         }//スプレッドが1を越えたら一旦戻すの終了
     }
+
     /**
-     * リリースするためのストラテジー
-     * 1分足のMACDで判断する
+     * リリースするためのストラテジー 1分足のMACDで判断する
      */
-    private void setRelease(){
-        if((currentAsk - currentBid) < 1){
+    private void setRelease() {
+
+        if ((currentAsk - currentBid) < 1) {
             //MACD(SR[5])がシグナル(SR[4])より下、ヒストグラムSR[3]が0より下ならflagRerase=true
-            System.out.println("ヒストグラム:"+SR[0]+" シグナル:"+SR[1]+" MACD:"+SR[2]);
+            //System.out.println("ヒストグラム:" + SR[0] + " シグナル:" + SR[1] + " MACD:" + SR[2]);
             boolean flagRelease = (SR[2] < SR[1]) && (SR[0] < 0);
             //boolean flagRelease = (SR[5] < SR[4]) && (SR[3] < 0);
             //
             //作業中*********************************************
             //
-            if (flagRelease){
+            if (flagRelease) {
                 System.out.println("手仕舞いします！:" + oat.transactionNum);
                 releaseTransaction();
                 longOrder = false;
             }
         }
     }
+
     //トランザクションの有無でリリース
     private void releaseTransaction() {
         if (oat.transactionNum > 1) {//もしtransactionNumに値が入っていれば一旦建玉をリリース
@@ -161,5 +173,16 @@ public class TickerE extends FXRateEvent {
         oat.tickCounterHi = ((oat.tickCounterHi > this.currentAsk) ? oat.tickCounterHi : this.currentAsk);
         oat.tickCounterLow = ((oat.tickCounterLow < this.currentBid) ? oat.tickCounterLow : this.currentBid);
 
+    }
+
+    /**
+     * ストップロスを修正
+     */
+    private void modifyStopLoss(double stoploss) {
+        double orderPrice = this.setOrder.getPrice(oat.transactionNum);
+        if (orderPrice > (this.currentBidAsk + 0.3) && this.stoplossFlag) {
+            setOrder.setStopLoss(oat.transactionNum, stoploss);
+            this.stoplossFlag = false;
+        }
     }
 }

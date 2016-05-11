@@ -112,12 +112,12 @@ public class SetOrder {
     *ストップロスのセット
      * @param transactionNum 直近のトランザクションナンバー
     */
-    public void setStopLoss(long transactionNum){
+    public void setStopLoss(long transactionNum,double stoploss){
         try {
             MarketOrder marketOrder = account.getTradeWithId(transactionNum);
             double currentprice = marketOrder.getPrice();
-            System.out.println("getPrice:"+ currentprice);
-            marketOrder.getStopLoss().setPrice(currentprice - 0.03);           
+            System.out.println("currentPrice:"+ currentprice + "ストップロス値"+(currentprice + stoploss));
+            marketOrder.getStopLoss().setPrice(currentprice + stoploss);           
             this.account.modify(marketOrder);
             System.out.println("ストップロス:" + marketOrder.getStopLoss());
         } catch (AccountException ex) {
@@ -125,5 +125,19 @@ public class SetOrder {
         } catch (OAException ex) {
             Logger.getLogger(SetOrder.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    /**
+     * ポジション中の購入値段
+     * @param transactionNum
+     * @return 
+     */
+    public double getPrice(long transactionNum){
+        MarketOrder marketOrder = null;
+        try {
+            marketOrder = account.getTradeWithId(transactionNum);
+        } catch (AccountException ex) {
+            Logger.getLogger(SetOrder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return marketOrder.getPrice();
     }
 }
