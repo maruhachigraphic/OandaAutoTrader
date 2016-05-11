@@ -180,7 +180,11 @@ public class TickerE extends FXRateEvent {
      */
     private void modifyStopLoss(double stoploss) {
         double orderPrice = this.setOrder.getPrice(oat.transactionNum);
-        if (orderPrice > (this.currentBidAsk + 0.3) && this.stoplossFlag) {
+    
+        System.out.println("stoploss:"+ stoploss+" orderPrice:" + orderPrice+" flag:"+this.stoplossFlag);
+        boolean answer = ((this.currentBidAsk >= orderPrice + 0.03) && this.stoplossFlag);
+        System.out.println("分岐:" + answer);
+        if (answer) {
             setOrder.setStopLoss(oat.transactionNum, stoploss);
             this.stoplossFlag = false;
         }
