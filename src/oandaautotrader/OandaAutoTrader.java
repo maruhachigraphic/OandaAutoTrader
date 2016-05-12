@@ -61,6 +61,9 @@ public class OandaAutoTrader implements Observer {
     public static FXPair fxpair;
     // The current rates table
     private RateTable rateTable;
+    
+    //ロングかショートかのルールtrueならロングでトレード
+    public boolean rule;
 
     /**
      * ストラテジーで取得した結果を代入する変数
@@ -327,6 +330,7 @@ public class OandaAutoTrader implements Observer {
             this.username = p.getProperty("UserName");
             this.password = p.getProperty("PassWord");
             this.accountID = Integer.parseInt(p.getProperty("AccountID"));
+            this.rule = Boolean.parseBoolean(p.getProperty("rule"));
             this.TSL = Double.parseDouble(p.getProperty("TSL"));
             this.time = Integer.parseInt(p.getProperty("time"));
             this.historyTickTerm = Integer.parseInt(p.getProperty("historyTickTerm"));
