@@ -5,7 +5,6 @@
  */
 package oandaautotrader;
 
-import strategy.Strategy_D_macd_plugin;
 import com.oanda.fxtrade.api.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -37,7 +36,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * OandaAutoTraderのバージョンをStringで格納
      */
-    public static final String VERSION = "OandaAutoTrader ver0.45macp";
+    public static final String VERSION = "OandaAutoTrader ver0.5macd";
 
     // For keyboard input
     /**
