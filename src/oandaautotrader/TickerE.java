@@ -93,8 +93,8 @@ public class TickerE extends FXRateEvent {
         this.currentBid = REI.getTick().getBid();
         //System.out.println("TickerからstrategyResult" + Arrays.toString(OandaAutoTrader.strategyResult));
         this.SR = this.oat.strategyResult;//ストラテジーからのデータを取得
-        //MACDシグナルを記録
-        memoryMacdSignal.add(SR[0]);
+        //MACDシグナルを記録*******************保留＊＊＊＊＊＊＊＊＊＊＊＊
+        //memoryMacdSignal.add(SR[0]);
         //System.out.println(memoryMacdSignal.get(memoryMacdSignal.size() - 1));
         localStrategy();//ローカルなストラテジーを作動させる
     }
@@ -113,7 +113,7 @@ public class TickerE extends FXRateEvent {
             } else if (this.currentUnits > 0) {
                 //System.out.println("currentUnits:" + this.currentUnits); 
                 setLongRelease();
-                modifyStopLoss(0.01, 0.03);//ストップロスの修正
+                modifyStopLoss(0.01, 0.06);//ストップロスの修正
             }
         } else {
             if (this.currentUnits == 0) {
@@ -121,7 +121,7 @@ public class TickerE extends FXRateEvent {
             } else if (this.currentUnits < 0) {
                 //System.out.println("currentUnits:" + this.currentUnits); 
                 setShortRelease();
-                modifyStopLoss(-0.01, -0.03);//ストップロスの修正
+                modifyStopLoss(-0.01, -0.06);//ストップロスの修正
             }
         }
     }
@@ -138,13 +138,12 @@ public class TickerE extends FXRateEvent {
             if (flagLongBuy && !longOrder) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
                 System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
                 longOrder = true;//ロング注文フラグ発生
-                shortOrder = false;//ショート注文フラグを取り消し
                 releaseTransaction();//トランザクションがあればリリース
 
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
                 oat.transactionNum = setOrder.setDealing(units);
                 this.currentUnits = setOrder.getUnits(oat.transactionNum);
-                setOrder.setStopLoss(oat.transactionNum, (-0.04));//ストップロスの設定
+                setOrder.setStopLoss(oat.transactionNum, (-0.06));//ストップロスの設定
                 this.stoplossFlag = true;
                 //this.transactionArray.add( this.transactoncheck.getTransaction() );//
             }
@@ -159,15 +158,14 @@ public class TickerE extends FXRateEvent {
             boolean flagShortBuy = ((SR[2] < SR[1]) && (SR[0] < 0));//MACD(SR[2])がシグナル(SR[1])より下ならショートフラグTRUE
 
             if (flagShortBuy && !shortOrder) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
-                System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
-                longOrder = false;//ロング注文フラグ取り消し
+                System.out.println("！！！！！！！！！！！！売るぞ！！！！！！！！！！！！！");                
                 shortOrder = true;//ショート注文フラグ発生
                 releaseTransaction();//トランザクションがあればリリース
 
                 //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
                 oat.transactionNum = setOrder.setDealing(-units);//unitsを−にするとショートになる
                 this.currentUnits = setOrder.getUnits(oat.transactionNum);
-                setOrder.setStopLoss(oat.transactionNum, (0.04));//ストップロスの設定
+                setOrder.setStopLoss(oat.transactionNum, (0.06));//ストップロスの設定
                 this.stoplossFlag = true;
                 //this.transactionArray.add( this.transactoncheck.getTransaction() );//
             }
@@ -191,8 +189,8 @@ public class TickerE extends FXRateEvent {
             }
         }
     }
-    
-        /**
+
+    /**
      * リリースするためのストラテジー 1分足のMACDで判断する
      */
     private void setShortRelease() {
@@ -205,7 +203,7 @@ public class TickerE extends FXRateEvent {
             if (flagRelease) {
                 System.out.println("手仕舞いします！:" + oat.transactionNum);
                 releaseTransaction();
-                longOrder = false;
+                shortOrder = false;
             }
         }
     }
@@ -232,13 +230,23 @@ public class TickerE extends FXRateEvent {
      */
     private void modifyStopLoss(double stoploss, double limit) {
         double orderPrice = this.setOrder.getPrice(oat.transactionNum);
+        //System.out.println("stoploss:" + stoploss + " orderPrice:" + orderPrice + " flag:" + this.stoplossFlag);
 
-        System.out.println("stoploss:" + stoploss + " orderPrice:" + orderPrice + " flag:" + this.stoplossFlag);
-        boolean answer = ((this.currentBidAsk >= orderPrice + limit) && this.stoplossFlag);
-        System.out.println("分岐:" + answer);
-        if (answer) {
-            setOrder.setStopLoss(oat.transactionNum, stoploss);
-            this.stoplossFlag = false;
+        if (oat.rule) {//longの場合
+            boolean answer = ((this.currentBidAsk >= orderPrice + limit) && this.stoplossFlag);
+            //System.out.println("分岐:" + answer);
+            if (answer) {
+                setOrder.setStopLoss(oat.transactionNum, stoploss);
+                this.stoplossFlag = false;
+            }
+        }
+        if (!oat.rule) {//shortの場合
+            boolean answer = ((this.currentBidAsk <= orderPrice + limit) && this.stoplossFlag);
+            //System.out.println("分岐:" + answer);
+            if (answer) {
+                setOrder.setStopLoss(oat.transactionNum, stoploss);
+                this.stoplossFlag = false;
+            }
         }
     }
 }
