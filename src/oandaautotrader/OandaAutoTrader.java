@@ -36,7 +36,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * OandaAutoTraderのバージョンをStringで格納
      */
-    public static final String VERSION = "OandaAutoTrader ver0.51macd";
+    public static final String VERSION = "OandaAutoTrader ver0.52macd";
 
     // For keyboard input
     /**
@@ -132,7 +132,7 @@ public class OandaAutoTrader implements Observer {
         sleepCount = (time * 60 * 1000);
 
         //日足の取得期間を設定
-        tickInterval = TimeGetter.TIME5MIN;
+        tickInterval = TimeGetter.TIME1MIN;
         tickIntervalB = TimeGetter.TIME10MIN;
 
     }
