@@ -52,11 +52,11 @@ public class TickerE extends FXRateEvent {
     private ArrayList<Double> memoryMacdSignal;//MACDシグナルを保管
     
     //初段ストップロスの値
-    double firstStopLossValue = 0.06;
+    double firstStopLossValue = 0.01;
     //二段目ストップロスの値
-    double secondStopLossValue = 0.02;
+    double secondStopLossValue = 0.01;
     //二段目ストップロスを発動させるためのリミット値
-    double stopLossLimit = 0.05;
+    double stopLossLimit = 0.03;
     
     /**
      * コンストラクタ
@@ -113,7 +113,7 @@ public class TickerE extends FXRateEvent {
      */
     public void localStrategy() {
         this.currentBidAsk = (currentBid + currentAsk) / 2.0;//BidとAskの中値
-        //ruleがtrueであればロングで取引、falseであればショートで取引
+        //rule(ロング優先orショート優先)がtrueであればロングで取引、falseであればショートで取引
         if (this.rule) {
             if (this.currentUnits == 0) {
                 setLongbuy();
