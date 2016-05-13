@@ -54,9 +54,9 @@ public class TickerE extends FXRateEvent {
     //初段ストップロスの値
     double firstStopLossValue = 0.06;
     //二段目ストップロスの値
-    double secondStopLossValue = 0.03;
+    double secondStopLossValue = 0.02;
     //二段目ストップロスを発動させるためのリミット値
-    double stopLossLimit = 0.06;
+    double stopLossLimit = 0.05;
     
     /**
      * コンストラクタ
