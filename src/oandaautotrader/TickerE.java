@@ -52,11 +52,11 @@ public class TickerE extends FXRateEvent {
     private ArrayList<Double> memoryMacdSignal;//MACDシグナルを保管
     
     //初段ストップロスの値
-    double firstStopLossValue = 0.01;
+    double firstStopLossValue ;
     //二段目ストップロスの値
-    double secondStopLossValue = 0.01;
+    double secondStopLossValue ;
     //二段目ストップロスを発動させるためのリミット値
-    double stopLossLimit = 0.03;
+    double stopLossLimit ;
     
     /**
      * コンストラクタ
@@ -71,6 +71,9 @@ public class TickerE extends FXRateEvent {
         this.account = OAT.account;
 
         this.rule = OAT.rule;
+        this.firstStopLossValue = OAT.firstStopLossValue;
+        this.secondStopLossValue = OAT.secondStopLossValue;
+        this.stopLossLimit = OAT.stopLossLimit;
         this.shortOrder = false;
         this.longOrder = false;
         this.setOrder = new SetOrder(OAT);

@@ -90,6 +90,13 @@ public class OandaAutoTrader implements Observer {
      * トレーリングストップロスの値を代入する変数
      */
     public static double TSL;
+    
+    //初段ストップロスの値
+    public static double firstStopLossValue;
+    //二段目ストップロスの値
+    public static double secondStopLossValue;
+    //二段目ストップロスを発動させるためのリミット値
+    public static double stopLossLimit;
 
     /**
      * 全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
@@ -331,6 +338,9 @@ public class OandaAutoTrader implements Observer {
             this.accountID = Integer.parseInt(p.getProperty("AccountID"));
             this.rule = Boolean.parseBoolean(p.getProperty("rule"));
             this.TSL = Double.parseDouble(p.getProperty("TSL"));
+            this.firstStopLossValue = Double.parseDouble(p.getProperty("firstStopLossValue"));
+            this.secondStopLossValue = Double.parseDouble(p.getProperty("secondStopLossValue"));
+            this.stopLossLimit = Double.parseDouble(p.getProperty("stopLossLimit"));
             this.time = Integer.parseInt(p.getProperty("time"));
             this.historyTickTerm = Integer.parseInt(p.getProperty("historyTickTerm"));
             this.signal = Integer.parseInt(p.getProperty("signal"));
