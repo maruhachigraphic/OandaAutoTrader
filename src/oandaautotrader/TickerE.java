@@ -52,7 +52,7 @@ public class TickerE extends FXRateEvent {
     private ArrayList<Double> memoryMacdSignal;//MACDシグナルを保管
     
     //初段ストップロスの値
-    double firstStopLossValue = 0.06;
+    double firstStopLossValue = 0.01;
     //二段目ストップロスの値
     double secondStopLossValue = 0.02;
     //二段目ストップロスを発動させるためのリミット値
