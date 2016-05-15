@@ -198,7 +198,7 @@ public class TickerE2 extends FXRateEvent {
             //System.out.println("ヒストグラム:" + SR[0] + " シグナル:" + SR[1] + " MACD:" + SR[2]);
             //boolean flagRelease = (SR[2] < SR[1]) && (SR[0] < 0);
             //boolean flagRelease = (SR[5] < SR[4]) && (SR[3] < 0);
-            if (flagRelease) {
+            if (!flagRelease) {
                 System.out.println("ロングを手仕舞いします！:" + oat.transactionNum);
                 releaseTransaction();
                 longOrder = false;

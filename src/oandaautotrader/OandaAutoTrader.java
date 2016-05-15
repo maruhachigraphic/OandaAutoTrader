@@ -36,7 +36,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * OandaAutoTraderのバージョンをStringで格納
      */
-    public static final String VERSION = "OandaAutoTrader ver0.53macdE2";
+    public static final String VERSION = "OandaAutoTrader ver0.54macdE2";
 
     // For keyboard input
     /**
@@ -130,6 +130,7 @@ public class OandaAutoTrader implements Observer {
     public OandaAutoTrader() {
         //プロパティーの呼び出し
         fileReader();
+        if(this.rule){System.out.println("ストラテジ：ロング");}else{System.out.println("ストラテジ：ショート");}
 
         //FXPairの設定
         this.fxpair = com.oanda.fxtrade.api.API.createFXPair("USD/JPY");
