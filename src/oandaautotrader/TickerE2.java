@@ -56,6 +56,9 @@ public class TickerE2 extends FXRateEvent {
 
     private ArrayList<Double> memoryMacdSignal;//MACDシグナルを保管
 
+    private boolean longBuyFlag;
+    private boolean shortBuyFlag;
+
     //初段ストップロスの値
     double firstStopLossValue;
     //二段目ストップロスの値
@@ -146,12 +149,10 @@ public class TickerE2 extends FXRateEvent {
     private void setLongbuy() {
         //System.out.println("SR[2]MACD:" + SR[2] + " SR[1]シグナル:" + SR[1]+ " SR[0]ヒストグラム:" + SR[0]);
         //SR[5]=MACD長期 SR[4]=シグナル長期 SR[3]=ヒストグラム長期 
-        if ((currentAsk - currentBid) < 1) {//スプレッドが1以内であればtrue
-            boolean BuyFlag = ((SR[2] > SR[1]) && (SR[0] > 0));//MACD(SR[2])がシグナル(SR[1])より上ならロングフラグTRUE
-            //boolean flagLongBuy = (SR[5] > SR[4]) && (SR[3] > 0);
-            //boolean flagShortBuy = ((SR[2] < SR[1]) && (SR[0] < 0));//MACD(SR[2])がシグナル(SR[1])より下ならショートフラグTRUE
+        if ((currentAsk - currentBid) < 1) {
+            longBuyFlag = ((SR[2] > SR[1]) && (SR[0] > 0));
 
-            if (BuyFlag && !longOrder) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
+            if (macdHistogramFlag() && !longOrder && SR[0] < 0) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
                 System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
                 longOrder = true;//ロング注文フラグ発生
                 releaseTransaction();//トランザクションがあればリリース
@@ -170,9 +171,9 @@ public class TickerE2 extends FXRateEvent {
     private void setShortbuy() {
         //System.out.println("SR[2]MACD:" + SR[2] + " SR[1]シグナル:" + SR[1]+ " SR[0]ヒストグラム:" + SR[0]);
         //SR[5]=MACD長期 SR[4]=シグナル長期 SR[3]=ヒストグラム長期 
-        if ((currentAsk - currentBid) < 1) {//スプレッドが1以内であればtrue
-            boolean BuyFlag = ((SR[2] < SR[1]) && (SR[0] < 0));//MACD(SR[2])がシグナル(SR[1])より下ならショートフラグTRUE
-            if (BuyFlag && !shortOrder) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
+        if ((currentAsk - currentBid) < 1) {            
+            shortBuyFlag = ((SR[2] < SR[1]) && (SR[0] < 0));
+            if (!macdHistogramFlag() && !shortOrder && SR[0] > 0) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
                 System.out.println("！！！！！！！！！！！！売るぞ！！！！！！！！！！！！！");
                 shortOrder = true;//ショート注文フラグ発生
                 releaseTransaction();//トランザクションがあればリリース
@@ -194,11 +195,10 @@ public class TickerE2 extends FXRateEvent {
     private void setLongRelease() {
         if ((currentAsk - currentBid) < 1) {
             boolean flagRelease = macdHistogramFlag();
-            //MACD(SR[5])がシグナル(SR[4])より下、ヒストグラムSR[3]が0より下ならflagRerase=true
-            //System.out.println("ヒストグラム:" + SR[0] + " シグナル:" + SR[1] + " MACD:" + SR[2]);
-            //boolean flagRelease = (SR[2] < SR[1]) && (SR[0] < 0);
-            //boolean flagRelease = (SR[5] < SR[4]) && (SR[3] < 0);
-            if (!flagRelease) {
+            //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
+            boolean longSellFlag = (SR[2] < SR[1]);//MACDがシグナルより下
+
+            if (longSellFlag && !flagRelease) {
                 System.out.println("ロングを手仕舞いします！:" + oat.transactionNum);
                 releaseTransaction();
                 longOrder = false;
@@ -212,11 +212,10 @@ public class TickerE2 extends FXRateEvent {
     private void setShortRelease() {
         if ((currentAsk - currentBid) < 1) {//スプレッドが1より下であれば取引する
             boolean flagRelease = macdHistogramFlag();
-            //MACD(SR[3])がシグナル(SR[2])より上、ヒストグラムSR[1]が0より上ならflagRerase=true
-            //System.out.println("ヒストグラム:" + SR[0] + " シグナル:" + SR[1] + " MACD:" + SR[2]);
-            //boolean flagRelease = (SR[2] > SR[1]) && (SR[0] > 0);
-            //boolean flagRelease = (SR[5] < SR[4]) && (SR[3] < 0);
-            if (flagRelease) {
+            //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
+            boolean shortSellFlag = (SR[2] > SR[1]);//MACDがシグナルより上、ヒストグラムが0以下
+
+            if (shortSellFlag && flagRelease) {
                 System.out.println("ショートを手仕舞いします！:" + oat.transactionNum);
                 releaseTransaction();
                 shortOrder = false;
