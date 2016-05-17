@@ -29,6 +29,7 @@ public final class TimeGetter {
             TIME15SEC = 15,
             TIME30SEC = 30,
             TIME1MIN = 60,
+            TIME2MIN30SEC = 150,
             TIME3MIN = 180,
             TIME5MIN = 300,
             TIME10MIN = 600,
