@@ -152,7 +152,7 @@ public class TickerE2 extends FXRateEvent {
         if ((currentAsk - currentBid) < 1) {
             longBuyFlag = ((SR[2] > SR[1]) && (SR[0] > 0));
 
-            if (macdHistogramFlag() && !longOrder && SR[0] < 0) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
+            if (macdHistogramFlag() && !longOrder && SR[0] < 0) {//ヒストグラムが前より上、ロングオーダー無し、ヒストグラムが0より下
                 System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
                 longOrder = true;//ロング注文フラグ発生
                 releaseTransaction();//トランザクションがあればリリース
@@ -173,7 +173,7 @@ public class TickerE2 extends FXRateEvent {
         //SR[5]=MACD長期 SR[4]=シグナル長期 SR[3]=ヒストグラム長期 
         if ((currentAsk - currentBid) < 1) {            
             shortBuyFlag = ((SR[2] < SR[1]) && (SR[0] < 0));
-            if (!macdHistogramFlag() && !shortOrder && SR[0] > 0) {//もしflagLongBuyがtrue＆現在値が中期より上＆買い注文フラグがfalseなら
+            if (!macdHistogramFlag() && !shortOrder && SR[0] > 0) {//ヒストグラムが前より下、ショートオーダー無し、ヒストグラムが0より上
                 System.out.println("！！！！！！！！！！！！売るぞ！！！！！！！！！！！！！");
                 shortOrder = true;//ショート注文フラグ発生
                 releaseTransaction();//トランザクションがあればリリース
