@@ -152,21 +152,23 @@ public class TickerE2 extends FXRateEvent {
         if ((currentAsk - currentBid) < 1) {
             //長期MACDが長期シグナルの下、短期MACDが短期シグナルの上、短期ヒストグラムが0より上
             longBuyFlag = ((SR[5] < SR[4]) && (SR[2] > SR[1]) && (SR[0] > 0));
+            boolean longBuyFlagSecond = (SR[5] > SR[4]);
 
             if (longBuyFlag && !longOrder) {//longOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
-                longOrder = true;//ロング注文フラグ発生
-                releaseTransaction();//トランザクションがあればリリース
-
-                //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
-                oat.transactionNum = setOrder.setDealing(units);
-                this.currentUnits = setOrder.getUnits(oat.transactionNum);
-                //ストップロスの設定ロングなのでstopLossValueを現在値より低く設定する。stopLossValueに「-」マイナスを付ける。
-                setOrder.setStopLoss(oat.transactionNum, (-firstStopLossValue));
-                this.stoplossFlag = true;
-                //this.transactionArray.add( this.transactoncheck.getTransaction() );//
+                setLongbuySub();
+            }
+            if (longBuyFlagSecond && !longOrder) {//
+                System.out.println("！！！！！！！！！！！！ロング２段目発動！！！！！！！！！！！！！");
+                setLongbuySub();
             }
         }//スプレッドが1を越えたら一旦戻すの終了
+    }
+
+    private void setLongbuySub() {
+        longOrder = true;//ロング注文フラグ発生
+        releaseTransaction();//トランザクションがあればリリース
+        setOrderLocal(true);//オーダーの命令、ロングなのでtrue
     }
 
     private void setShortbuy() {
@@ -175,21 +177,40 @@ public class TickerE2 extends FXRateEvent {
         if ((currentAsk - currentBid) < 1) {
             //長期MACDが長期シグナルの上、短期MACDが短期シグナルの下、短期ヒストグラムが0より下
             shortBuyFlag = ((SR[5] > SR[4]) && (SR[2] < SR[1]) && (SR[0] < 0));
-            
+            boolean shortBuyFlagSecond = (SR[5] < SR[4]);
+
             if (shortBuyFlag && !shortOrder) {//shortOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！売るぞ！！！！！！！！！！！！！");
-                shortOrder = true;//ショート注文フラグ発生
-                releaseTransaction();//トランザクションがあればリリース
-
-                //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
-                oat.transactionNum = setOrder.setDealing(-units);//unitsを−にするとショートになる
-                this.currentUnits = setOrder.getUnits(oat.transactionNum);
-                //ストップロスの設定、ショートなのでstopLossValueを現在値より高く設定する。
-                setOrder.setStopLoss(oat.transactionNum, (firstStopLossValue));
-                this.stoplossFlag = true;
-                //this.transactionArray.add( this.transactoncheck.getTransaction() );//
+                setShortbuySub();
             }
-        }//スプレッドが1を越えたら一旦戻すの終了
+            if(shortBuyFlagSecond && !longOrder){
+                System.out.println("！！！！！！！！！！！！ショート２段目発動！！！！！！！！！！！！！");
+                setShortbuySub();
+            }
+        }
+    }
+    
+    private void setShortbuySub(){
+                shortOrder = true;//ショート注文フラグ発生
+                releaseTransaction();//トランザクションがあればリリース            
+                setOrderLocal(false);//オーダーの命令　ショートなのでfalse
+    }
+
+    /**
+     * setLongbuy、setShortbuyで使用するオーダー命令
+     *
+     * @param flag ロングならtrue、ショートならfalse
+     */
+    private void setOrderLocal(boolean flag) {
+        int a = (flag ? (1) : (-1));
+        //！！！！！！！！！！！！！！発注！！！！！！！！！！！！！！！！！
+        oat.transactionNum = setOrder.setDealing(units * a);//unitsを−にするとショートになる
+        this.currentUnits = setOrder.getUnits(oat.transactionNum);
+        //ストップロスの設定、stopLossValueを現在値よりマイナスに設定する。
+        //ロングの例＞0.05*(-1*(1))= -0.05
+        //ショート例＞0.05*(-1*(-1))= 0.05
+        setOrder.setStopLoss(oat.transactionNum, (firstStopLossValue * (-a)));
+        this.stoplossFlag = true;
     }
 
     /**
