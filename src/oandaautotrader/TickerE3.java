@@ -134,7 +134,8 @@ public class TickerE3 extends FXRateEvent {
                 macdHistogramMem_SR0 = SR[0];//macdヒストグラムを一時保存
                 macdHistogramMem_SR3 = SR[3];//長期macdヒストグラム一時保存
             } else if (this.currentUnits > 0) {
-                //System.out.println("currentUnits:" + this.currentUnits); 
+                //System.out.println("currentUnits:" + this.currentUnits);
+                setOrder.dealingCheck(oat.transactionNum);
                 setLongRelease();
                 modifyStopLoss(secondStopLossValue, stopLossLimit);//ストップロスの修正
             }
@@ -145,6 +146,7 @@ public class TickerE3 extends FXRateEvent {
                 macdHistogramMem_SR3 = SR[3];//長期macdヒストグラム一時保存
             } else if (this.currentUnits < 0) {
                 //System.out.println("currentUnits:" + this.currentUnits); 
+                setOrder.dealingCheck(oat.transactionNum);
                 setShortRelease();
                 modifyStopLoss(-secondStopLossValue, -stopLossLimit);//ストップロスの修正
             }
