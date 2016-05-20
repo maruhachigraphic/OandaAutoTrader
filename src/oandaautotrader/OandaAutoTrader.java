@@ -36,7 +36,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * OandaAutoTraderのバージョンをStringで格納
      */
-    public static final String VERSION = "OandaAutoTrader ver0.55macdE2";
+    public static final String VERSION = "OandaAutoTrader ver0.57macdE3";
 
     // For keyboard input
     /**
@@ -173,7 +173,7 @@ public class OandaAutoTrader implements Observer {
                 }, 1, 10, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　10秒
 
         //ティッカークラスの呼び出し
-        FXRateEvent ticker = new TickerE2(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
+        FXRateEvent ticker = new TickerE3(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
         //getEventManager.add(FXEvent型)でFXEventを動作させる。何かイベントがあるごとに作動する。
         thisClass.rateTable.getEventManager().add(ticker);
 

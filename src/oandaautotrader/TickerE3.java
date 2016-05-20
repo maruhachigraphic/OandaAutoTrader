@@ -20,7 +20,7 @@ import java.util.ArrayList;
  *
  * @author maruhachi
  */
-public class TickerE2 extends FXRateEvent {
+public class TickerE3 extends FXRateEvent {
 
     private final OandaAutoTrader oat;
     private final Account account;
@@ -76,7 +76,7 @@ public class TickerE2 extends FXRateEvent {
      * @param fxpair_ticker fxpairを入れる引数
      */
     //public Ticker(FXPair fxpair_ticker, Account account_ticker) {
-    public TickerE2(OandaAutoTrader OAT, FXPair fxpair_ticker) {
+    public TickerE3(OandaAutoTrader OAT, FXPair fxpair_ticker) {
         super(fxpair_ticker.toString());//super(親)はFXRateEvent
         this.oat = OAT;
         this.account = OAT.account;
