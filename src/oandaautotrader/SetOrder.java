@@ -140,4 +140,18 @@ public class SetOrder {
         }
         return marketOrder.getPrice();
     }
+    public boolean dealingCheck(long transactionNum){
+    MarketOrder marketOrder = null;
+    boolean check;
+        try {
+            marketOrder = account.getTradeWithId(transactionNum);
+        } catch (AccountException ex) {
+            Logger.getLogger(SetOrder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println(marketOrder.toString());
+        check = marketOrder != null;
+        System.out.println("トランザクションチェック:"+ check);
+        return check;
+    }
+    
 }

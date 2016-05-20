@@ -155,17 +155,13 @@ public class TickerE3 extends FXRateEvent {
         //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
         //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
         if ((currentAsk - currentBid) < 1) {
-            //長期MACDが長期シグナルの下、短期MACDが短期シグナルの上、短期ヒストグラムが0より上、長期ヒストグラムがプラスへ反転
-            longBuyFlag = ((SR[5] < SR[4]) && (SR[2] > SR[1]) && (SR[0] > 0) && macdHistogramFlag_SR3());
-            boolean longBuyFlagSecond = (SR[5] > SR[4]);
-
+            //長期MACDが長期シグナルの上、短期MACDが短期シグナルの上、短期ヒストグラムが0より上、長期ヒストグラムがプラスへ反転
+            //longBuyFlag = ((SR[5] > SR[4]) && (SR[2] > SR[1]) && (SR[0] > 0) && macdHistogramFlag_SR3());
+            longBuyFlag = ((SR[2] > SR[1]) && (SR[0] > 0) && macdHistogramFlag_SR3());
             if (longBuyFlag && !longOrder) {//longOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
                 setLongbuySub();
-            }
-            if (longBuyFlagSecond && !longOrder) {//
-                System.out.println("！！！！！！！！！！！！ロング２段目発動！！！！！！！！！！！！！");
-                setLongbuySub();
+                setOrder.dealingCheck(oat.transactionNum);
             }
         }//スプレッドが1を越えたら一旦戻すの終了
     }
@@ -181,16 +177,12 @@ public class TickerE3 extends FXRateEvent {
         //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
         if ((currentAsk - currentBid) < 1) {
             //長期MACDが長期シグナルの上、短期MACDが短期シグナルの下、短期ヒストグラムが0より下、長期ヒストグラムがマイナスへ反転
-            shortBuyFlag = ((SR[5] > SR[4]) && (SR[2] < SR[1]) && (SR[0] < 0) && !macdHistogramFlag_SR3());
-            boolean shortBuyFlagSecond = (SR[5] < SR[4]);
-
+            //shortBuyFlag = ((SR[5] > SR[4]) && (SR[2] < SR[1]) && (SR[0] < 0) && !macdHistogramFlag_SR3());
+            shortBuyFlag = ((SR[2] < SR[1]) && (SR[0] < 0) && !macdHistogramFlag_SR3());
             if (shortBuyFlag && !shortOrder) {//shortOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！売るぞ！！！！！！！！！！！！！");
                 setShortbuySub();
-            }
-            if(shortBuyFlagSecond && !longOrder){
-                System.out.println("！！！！！！！！！！！！ショート２段目発動！！！！！！！！！！！！！");
-                setShortbuySub();
+                setOrder.dealingCheck(oat.transactionNum);
             }
         }
     }
@@ -226,8 +218,9 @@ public class TickerE3 extends FXRateEvent {
             //boolean flagRelease = macdHistogramFlag();
             //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
             //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
-            boolean longSellFlag = ((SR[5] < SR[4]) && (SR[2] < SR[1]));//長短MACDがシグナルより下
-
+            //boolean longSellFlag = ((SR[5] < SR[4]) && (SR[2] < SR[1]));//長短MACDがシグナルより下
+            boolean longSellFlag = ((SR[2] < SR[1]));
+            
             if (longSellFlag) {
                 System.out.println("ロングを手仕舞いします！:" + oat.transactionNum);
                 releaseTransaction();
@@ -244,7 +237,7 @@ public class TickerE3 extends FXRateEvent {
             //boolean flagRelease = macdHistogramFlag();
             //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
             //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
-            boolean shortSellFlag = ((SR[5] > SR[4]) && (SR[2] > SR[1]));//長短MACDがシグナルより上
+            boolean shortSellFlag = ((SR[2] > SR[1]));//長短MACDがシグナルより上
 
             if (shortSellFlag) {
                 System.out.println("ショートを手仕舞いします！:" + oat.transactionNum);

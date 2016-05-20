@@ -60,7 +60,10 @@ public class OandaAutoTrader implements Observer {
     public static FXPair fxpair;
     // The current rates table
     private RateTable rateTable;
-    
+
+    //ストラテジーの選択 例＞strategy = "TickerE"
+    public static String strategy;
+
     //ロングかショートかのルールtrueならロングでトレード
     public boolean rule;
 
@@ -69,9 +72,9 @@ public class OandaAutoTrader implements Observer {
      */
     public static volatile double[] strategyResult;
     public static volatile double[] strategyResultB;
-    
+
     /**
-     *GetHistoryで取得する日足のリストを代入する変数
+     * GetHistoryで取得する日足のリストを代入する変数
      */
     public static volatile ArrayList<String[]> HiashiList;
     public static volatile ArrayList<String[]> HiashiListB;
@@ -90,7 +93,7 @@ public class OandaAutoTrader implements Observer {
      * トレーリングストップロスの値を代入する変数
      */
     public static double TSL;
-    
+
     //初段ストップロスの値
     public static double firstStopLossValue;
     //二段目ストップロスの値
@@ -113,28 +116,32 @@ public class OandaAutoTrader implements Observer {
     public static int signal;
     public static int intM;
     public static int intS;
-    
+
     /**
-     *MACPのスパン
+     * MACPのスパン
      */
     public static int macpSpan;
-    
+
     /**
-     *ティックの直近最高値安値を記録
+     * ティックの直近最高値安値を記録
      */
     public volatile double tickCounterHi;
     public volatile double tickCounterLow;
+
     /**
      * コンストラクタ
      */
     public OandaAutoTrader() {
         //プロパティーの呼び出し
         fileReader();
-        if(this.rule){System.out.println("ストラテジ：ロング");}else{System.out.println("ストラテジ：ショート");}
+        if (this.rule) {
+            System.out.println("ストラテジ：ロング");
+        } else {
+            System.out.println("ストラテジ：ショート");
+        }
 
         //FXPairの設定
         this.fxpair = com.oanda.fxtrade.api.API.createFXPair("USD/JPY");
-
 
         //全体の実行時間 roopメソッドで使用 1 * 60 * 1000ms = 1分
         sleepCount = (time * 60 * 1000);
@@ -149,6 +156,8 @@ public class OandaAutoTrader implements Observer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+ System.out.println("VERSION:" + VERSION);
+
         OandaAutoTrader thisClass = new OandaAutoTrader();
         thisClass.init(username, password);
 
@@ -168,12 +177,24 @@ public class OandaAutoTrader implements Observer {
                         //System.out.println("Result =" + Arrays.toString(result));
                     });
                     executorFuture.execute(new Strategy_E_macDandP_plugin(thisClass, futureCall));//！！！！ここでストラテジーをnewする！！！！！！
-                    //System.out.println("strategyResult =" + Arrays.toString(strategyResult));
-
                 }, 1, 10, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　10秒
 
+        FXRateEvent ticker;
         //ティッカークラスの呼び出し
-        FXRateEvent ticker = new TickerE3(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
+        switch (strategy) {
+            case "TickerE2":
+
+                ticker = new TickerE2(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
+                break;
+            case "TickerE3":
+                ticker = new TickerE3(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
+                break;
+            default:
+                System.out.println("ストラテジーが呼び出されませんでした");
+                return;
+        }
+
+        System.out.println(strategy);
         //getEventManager.add(FXEvent型)でFXEventを動作させる。何かイベントがあるごとに作動する。
         thisClass.rateTable.getEventManager().add(ticker);
 
@@ -253,7 +274,6 @@ public class OandaAutoTrader implements Observer {
         //System.out.println("なんか押すと始まる！");
         //String name = new java.util.Scanner(System.in).nextLine();
         //System.out.println("おけ！");
-        
         /*
          Thread menuThread = new Thread("Example.menuThread") {
          @Override
@@ -272,7 +292,6 @@ public class OandaAutoTrader implements Observer {
 
          menuThread.start();
          */
-
     }
 
     @Override
@@ -337,6 +356,7 @@ public class OandaAutoTrader implements Observer {
             this.username = p.getProperty("UserName");
             this.password = p.getProperty("PassWord");
             this.accountID = Integer.parseInt(p.getProperty("AccountID"));
+            this.strategy = p.getProperty("Strategy");
             this.rule = Boolean.parseBoolean(p.getProperty("rule"));
             this.TSL = Double.parseDouble(p.getProperty("TSL"));
             this.firstStopLossValue = Double.parseDouble(p.getProperty("firstStopLossValue"));
@@ -348,7 +368,7 @@ public class OandaAutoTrader implements Observer {
             this.intM = Integer.parseInt(p.getProperty("intM"));
             this.intS = Integer.parseInt(p.getProperty("intS"));
             this.macpSpan = Integer.parseInt(p.getProperty("macpSpan"));
-            
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(OandaAutoTrader.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
