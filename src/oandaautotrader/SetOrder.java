@@ -108,16 +108,18 @@ public class SetOrder {
         }
         return units1;
     }
+
     /**
-    *ストップロスのセット
+     * ストップロスのセット
+     *
      * @param transactionNum 直近のトランザクションナンバー
-    */
-    public void setStopLoss(long transactionNum,double stoploss){
+     */
+    public void setStopLoss(long transactionNum, double stoploss) {
         try {
             MarketOrder marketOrder = account.getTradeWithId(transactionNum);
             double currentprice = marketOrder.getPrice();
-            System.out.println("currentPrice:"+ currentprice + "ストップロス値"+(currentprice + stoploss));
-            marketOrder.getStopLoss().setPrice(currentprice + stoploss);           
+            System.out.println("currentPrice:" + currentprice + "ストップロス値" + (currentprice + stoploss));
+            marketOrder.getStopLoss().setPrice(currentprice + stoploss);
             this.account.modify(marketOrder);
             System.out.println("ストップロス:" + marketOrder.getStopLoss());
         } catch (AccountException ex) {
@@ -126,12 +128,14 @@ public class SetOrder {
             Logger.getLogger(SetOrder.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     /**
      * ポジション中の購入値段
+     *
      * @param transactionNum
-     * @return 
+     * @return
      */
-    public double getPrice(long transactionNum){
+    public double getPrice(long transactionNum) {
         MarketOrder marketOrder = null;
         try {
             marketOrder = account.getTradeWithId(transactionNum);
@@ -140,18 +144,11 @@ public class SetOrder {
         }
         return marketOrder.getPrice();
     }
-    public boolean dealingCheck(long transactionNum){
-    MarketOrder marketOrder = null;
-    boolean check;
-        try {
-            marketOrder = account.getTradeWithId(transactionNum);
-        } catch (AccountException ex) {
-            Logger.getLogger(SetOrder.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println(marketOrder.toString());
-        check = marketOrder != null;
-        System.out.println("トランザクションチェック:"+ check);
-        return check;
+
+    public boolean dealingCheck() throws AccountException {
+        boolean check = false;
+    //System.out.println(oat.account.getPosition(fxpair));
+    if ((oat.account.getPosition(fxpair))!=null){check = true;}
+    return check;
     }
-    
 }

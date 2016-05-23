@@ -6,6 +6,7 @@
 package oandaautotrader;
 
 import com.oanda.fxtrade.api.Account;
+import com.oanda.fxtrade.api.AccountException;
 import com.oanda.fxtrade.api.FXEventInfo;
 import com.oanda.fxtrade.api.FXEventManager;
 import com.oanda.fxtrade.api.FXPair;
@@ -14,6 +15,8 @@ import com.oanda.fxtrade.api.FXRateEventInfo;
 import com.oanda.fxtrade.api.MarketOrder;
 import indicators.MACP;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * スレッドでティックを常時監視し、売買パターンを通してオーダーする MACDとMACP（移動平均乖離率）を使用する。
@@ -48,7 +51,7 @@ public class TickerE3 extends FXRateEvent {
     //MACDシグナルを一時記録するための変数 SR0：短期 SR3：長期
     private double macdHistogramMem_SR0;
     private double macdHistogramMem_SR3;
-    
+
     //MACDシグナルが前回より＋であればtrue、−であればfalse
     private boolean macdHistogramFlag_SR0;
     private boolean macdHistogramFlag_SR3;
@@ -135,7 +138,7 @@ public class TickerE3 extends FXRateEvent {
                 macdHistogramMem_SR3 = SR[3];//長期macdヒストグラム一時保存
             } else if (this.currentUnits > 0) {
                 //System.out.println("currentUnits:" + this.currentUnits);
-                setOrder.dealingCheck(oat.transactionNum);
+
                 setLongRelease();
                 modifyStopLoss(secondStopLossValue, stopLossLimit);//ストップロスの修正
             }
@@ -146,7 +149,7 @@ public class TickerE3 extends FXRateEvent {
                 macdHistogramMem_SR3 = SR[3];//長期macdヒストグラム一時保存
             } else if (this.currentUnits < 0) {
                 //System.out.println("currentUnits:" + this.currentUnits); 
-                setOrder.dealingCheck(oat.transactionNum);
+
                 setShortRelease();
                 modifyStopLoss(-secondStopLossValue, -stopLossLimit);//ストップロスの修正
             }
@@ -158,12 +161,10 @@ public class TickerE3 extends FXRateEvent {
         //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
         if ((currentAsk - currentBid) < 1) {
             //長期MACDが長期シグナルの上、短期MACDが短期シグナルの上、短期ヒストグラムが0より上、長期ヒストグラムがプラスへ反転
-            //longBuyFlag = ((SR[5] > SR[4]) && (SR[2] > SR[1]) && (SR[0] > 0) && macdHistogramFlag_SR3());
-            longBuyFlag = ((SR[2] > SR[1]) && (SR[0] > 0) && macdHistogramFlag_SR3());
+            longBuyFlag = (SR[2] > SR[1] && methodMacdHistogramFlag_SR0() && methodMacdHistogramFlag_SR3());
             if (longBuyFlag && !longOrder) {//longOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
                 setLongbuySub();
-                setOrder.dealingCheck(oat.transactionNum);
             }
         }//スプレッドが1を越えたら一旦戻すの終了
     }
@@ -180,19 +181,19 @@ public class TickerE3 extends FXRateEvent {
         if ((currentAsk - currentBid) < 1) {
             //長期MACDが長期シグナルの上、短期MACDが短期シグナルの下、短期ヒストグラムが0より下、長期ヒストグラムがマイナスへ反転
             //shortBuyFlag = ((SR[5] > SR[4]) && (SR[2] < SR[1]) && (SR[0] < 0) && !macdHistogramFlag_SR3());
-            shortBuyFlag = ((SR[2] < SR[1]) && (SR[0] < 0) && !macdHistogramFlag_SR3());
+
+            shortBuyFlag = (SR[2] < SR[1] && !methodMacdHistogramFlag_SR0() && !methodMacdHistogramFlag_SR3());
             if (shortBuyFlag && !shortOrder) {//shortOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！売るぞ！！！！！！！！！！！！！");
                 setShortbuySub();
-                setOrder.dealingCheck(oat.transactionNum);
             }
         }
     }
-    
-    private void setShortbuySub(){
-                shortOrder = true;//ショート注文フラグ発生
-                releaseTransaction();//トランザクションがあればリリース            
-                setOrderLocal(false);//オーダーの命令　ショートなのでfalse
+
+    private void setShortbuySub() {
+        shortOrder = true;//ショート注文フラグ発生
+        releaseTransaction();//トランザクションがあればリリース            
+        setOrderLocal(false);//オーダーの命令　ショートなのでfalse
     }
 
     /**
@@ -221,14 +222,16 @@ public class TickerE3 extends FXRateEvent {
             //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
             //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
             //boolean longSellFlag = ((SR[5] < SR[4]) && (SR[2] < SR[1]));//長短MACDがシグナルより下
-            boolean longSellFlag = ((SR[2] < SR[1]));
-            
+            boolean longSellFlag = ((SR[2] < SR[1]) && (SR[5] < SR[4]));
+
             if (longSellFlag) {
                 System.out.println("ロングを手仕舞いします！:" + oat.transactionNum);
                 releaseTransaction();
                 longOrder = false;
             }
         }
+        //建玉がなければoat.transactionNum = 0、this.currentUnits = 0として、リセットする
+        orderCheck();
     }
 
     /**
@@ -239,14 +242,32 @@ public class TickerE3 extends FXRateEvent {
             //boolean flagRelease = macdHistogramFlag();
             //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
             //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
-            boolean shortSellFlag = ((SR[2] > SR[1]));//長短MACDがシグナルより上
-
+            boolean shortSellFlag = ((SR[2] > SR[1]) && (SR[5] > SR[4]));//長短MACDがシグナルより上
             if (shortSellFlag) {
                 System.out.println("ショートを手仕舞いします！:" + oat.transactionNum);
                 releaseTransaction();
                 shortOrder = false;
             }
         }
+        //建玉がなければoat.transactionNum = 0、this.currentUnits = 0として、リセットする
+        orderCheck();
+    }
+
+    private boolean orderCheck() {
+        boolean check = false;
+        try {
+            check = setOrder.dealingCheck();
+        } catch (AccountException ex) {
+            Logger.getLogger(TickerE3.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (!check) {
+            oat.transactionNum = 0;
+            this.currentUnits = 0;
+            longOrder = false;
+            shortOrder = false;
+        }
+        //System.out.println("transactionnum:" + oat.transactionNum + " units:" + this.currentUnits);
+        return check;
     }
 
     //トランザクションの有無でリリース
@@ -290,7 +311,7 @@ public class TickerE3 extends FXRateEvent {
         }
     }
 
-    private boolean macdHistogramFlag_SR0() {
+    private boolean methodMacdHistogramFlag_SR0() {
         if (SR[0] > macdHistogramMem_SR0) {
             macdHistogramMem_SR0 = SR[0];
             macdHistogramFlag_SR0 = true;
@@ -300,8 +321,9 @@ public class TickerE3 extends FXRateEvent {
         }
         return macdHistogramFlag_SR0;
     }
-    private boolean macdHistogramFlag_SR3(){
-            if (SR[3] > macdHistogramMem_SR3) {
+
+    private boolean methodMacdHistogramFlag_SR3() {
+        if (SR[3] > macdHistogramMem_SR3) {
             macdHistogramMem_SR3 = SR[3];
             macdHistogramFlag_SR3 = true;
         } else if (SR[3] < macdHistogramMem_SR3) {
