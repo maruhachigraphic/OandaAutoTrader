@@ -160,7 +160,7 @@ public class TickerE3 extends FXRateEvent {
         //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
         //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
         if ((currentAsk - currentBid) < 1) {
-            //長期MACDが長期シグナルの上、短期MACDが短期シグナルの上、短期ヒストグラムが0より上、長期ヒストグラムがプラスへ反転
+            //短期MACDが短期シグナルの上、短期ヒストグラムが0より上、長期ヒストグラムがプラスへ反転
             longBuyFlag = (SR[2] > SR[1] && methodMacdHistogramFlag_SR0() && methodMacdHistogramFlag_SR3());
             if (longBuyFlag && !longOrder) {//longOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
@@ -179,9 +179,8 @@ public class TickerE3 extends FXRateEvent {
         //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
         //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
         if ((currentAsk - currentBid) < 1) {
-            //長期MACDが長期シグナルの上、短期MACDが短期シグナルの下、短期ヒストグラムが0より下、長期ヒストグラムがマイナスへ反転
             //shortBuyFlag = ((SR[5] > SR[4]) && (SR[2] < SR[1]) && (SR[0] < 0) && !macdHistogramFlag_SR3());
-
+            //短期MACDが短期シグナルの下、短期ヒストグラムが0より下、長期ヒストグラムがマイナスへ反転
             shortBuyFlag = (SR[2] < SR[1] && !methodMacdHistogramFlag_SR0() && !methodMacdHistogramFlag_SR3());
             if (shortBuyFlag && !shortOrder) {//shortOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！売るぞ！！！！！！！！！！！！！");
@@ -214,7 +213,7 @@ public class TickerE3 extends FXRateEvent {
     }
 
     /**
-     * ロングをリリースするためのストラテジー 1分足のMACDで判断する
+     * ロングをリリースするためのストラテジー MACDで判断する
      */
     private void setLongRelease() {
         if ((currentAsk - currentBid) < 1) {
@@ -252,7 +251,11 @@ public class TickerE3 extends FXRateEvent {
         //建玉がなければoat.transactionNum = 0、this.currentUnits = 0として、リセットする
         orderCheck();
     }
-
+    /**
+     * 建玉があるかチェックする。返り値：true＝建玉あり　false＝建玉無し
+     * @return 
+     */
+    
     private boolean orderCheck() {
         boolean check = false;
         try {
