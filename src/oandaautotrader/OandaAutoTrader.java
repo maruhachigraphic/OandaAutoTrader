@@ -147,8 +147,8 @@ public class OandaAutoTrader implements Observer {
         sleepCount = (time * 60 * 1000);
 
         //日足の取得期間を設定
-        tickInterval = TimeGetter.TIME30SEC;
-        tickIntervalB = TimeGetter.TIME2MIN30SEC;
+        tickInterval = TimeGetter.TIME2MIN30SEC;
+        tickIntervalB = TimeGetter.TIME30MIN;
 
     }
 
@@ -177,7 +177,7 @@ public class OandaAutoTrader implements Observer {
                         //System.out.println("Result =" + Arrays.toString(result));
                     });
                     executorFuture.execute(new Strategy_E_macDandP_plugin(thisClass, futureCall));//！！！！ここでストラテジーをnewする！！！！！！
-                }, 1, 10, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　10秒
+                }, 1, 30, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　10秒
 
         FXRateEvent ticker;
         //ティッカークラスの呼び出し

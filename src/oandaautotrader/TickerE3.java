@@ -160,8 +160,9 @@ public class TickerE3 extends FXRateEvent {
         //SR[0]ヒストグラム SR[1]シグナル　SR[2]MACD
         //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
         if ((currentAsk - currentBid) < 1) {
-            //短期MACDが短期シグナルの上、短期ヒストグラムが0より上、長期ヒストグラムがプラスへ反転
-            longBuyFlag = (SR[2] > SR[1] && methodMacdHistogramFlag_SR0() && methodMacdHistogramFlag_SR3());
+            //短期MACDが短期シグナルの上、長期ヒストグラムがプラスへ反転
+            System.out.println("SR3:" + methodMacdHistogramFlag_SR3());
+            longBuyFlag = (SR[2] > SR[1] && methodMacdHistogramFlag_SR3());
             if (longBuyFlag && !longOrder) {//longOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！買うぞ！！！！！！！！！！！！！");
                 setLongbuySub();
@@ -180,8 +181,9 @@ public class TickerE3 extends FXRateEvent {
         //SR[3]=ヒストグラム長期 SR[4]=シグナル長期 SR[5]=MACD長期
         if ((currentAsk - currentBid) < 1) {
             //shortBuyFlag = ((SR[5] > SR[4]) && (SR[2] < SR[1]) && (SR[0] < 0) && !macdHistogramFlag_SR3());
-            //短期MACDが短期シグナルの下、短期ヒストグラムが0より下、長期ヒストグラムがマイナスへ反転
-            shortBuyFlag = (SR[2] < SR[1] && !methodMacdHistogramFlag_SR0() && !methodMacdHistogramFlag_SR3());
+            //短期MACDが短期シグナルの下、長期ヒストグラムがマイナスへ反転
+            System.out.println("SR3:" + methodMacdHistogramFlag_SR3());
+            shortBuyFlag = (SR[2] < SR[1] && !methodMacdHistogramFlag_SR3());
             if (shortBuyFlag && !shortOrder) {//shortOrderがfalseなら
                 System.out.println("！！！！！！！！！！！！売るぞ！！！！！！！！！！！！！");
                 setShortbuySub();
