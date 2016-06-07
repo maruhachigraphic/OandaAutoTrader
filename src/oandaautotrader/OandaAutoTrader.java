@@ -147,7 +147,7 @@ public class OandaAutoTrader implements Observer {
         sleepCount = (time * 60 * 1000);
 
         //日足の取得期間を設定
-        tickInterval = TimeGetter.TIME5MIN;
+        tickInterval = (TimeGetter.TIME5MIN + TimeGetter.TIME2MIN30SEC);//7分30秒x2=15分
         tickIntervalB = TimeGetter.TIME30MIN;
 
     }
