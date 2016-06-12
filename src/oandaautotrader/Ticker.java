@@ -88,8 +88,8 @@ public class Ticker extends FXRateEvent {
      * SR[0]長期　SR[1]中期　SR[2]短期
      */
     public void localStrategy() {
-        System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
-        System.out.println("SR[2]短期:" + SR[2] + " SR[1]中期:" + SR[1]);
+        //System.out.println("現在BID値：" + currentBid + " ASK値：" + currentAsk);
+        //System.out.println("SR[2]短期:" + SR[2] + " SR[1]中期:" + SR[1]);
         
         if ((currentAsk - currentBid) < 1) {//スプレッドが1以内であればtrue
 
@@ -121,7 +121,7 @@ public class Ticker extends FXRateEvent {
                 transactionNum = setOrder.setDealing(-units);//-unitsで-100となりショート取引となる
 
             } else {
-                System.out.println("ほっとくわ・・・");
+                //System.out.println("ほっとくわ・・・");
             }
         }//スプレッドが1を越えたら一旦戻すの終了
     }
