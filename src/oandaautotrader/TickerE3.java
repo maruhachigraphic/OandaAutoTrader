@@ -29,7 +29,7 @@ public class TickerE3 extends FXRateEvent {
     private final Account account;
     private MarketOrder marketOrder;
 
-    private boolean rule;
+    private final boolean rule;
     private double delta;
     //private boolean watchingBuyOrder;
     private volatile double currentAsk;
