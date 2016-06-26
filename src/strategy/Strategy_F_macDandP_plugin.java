@@ -1,0 +1,160 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package strategy;
+
+import com.oanda.fxtrade.api.API;
+import com.oanda.fxtrade.api.Account;
+import com.oanda.fxtrade.api.FXClient;
+import com.oanda.fxtrade.api.FXPair;
+import com.oanda.fxtrade.api.RateTable;
+import com.oanda.fxtrade.api.SessionDisconnectedException;
+import indicators.MACD;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import oandaautotrader.GetHistoryArray;
+import oandaautotrader.OandaAutoTrader;
+import oandaautotrader.TimeGetter;
+
+/**
+ * ストラテジー　デモプラグイン。newして使用する。 <br>これはテストストラテジーEです。 MACDとMACP(移動平均乖離率)を使用します。
+ *
+ * @author maruhachi
+ */
+public class Strategy_F_macDandP_plugin extends StrategyTemplate implements Runnable {
+
+    private final CompletableFuture<double[]> future;
+
+    private final FXClient fxclient;
+    private final FXPair fxpair;
+    private final Account account;
+    private RateTable rateTable;
+    double[] strategyResult;
+    double[] strategyResultB;
+
+    /**
+     * ストラテジーの期間
+     */
+    private final int signal;
+
+    private final int intS;
+    private final int intM;
+    private final int intL;
+
+    /**
+     *
+     * @param OAT OandaAutoTrader内のフィールドを利用するための引数
+     * @param future CompletableFuture＜double[]＞の引数
+     */
+    //public Strategy_B2_plugin(OandaAutoTrader oandaAutoTraderLocal,FXClient fxclient, FXPair fxpair, Account account, CompletableFuture<double[]> future) {
+    public Strategy_F_macDandP_plugin(OandaAutoTrader OAT, CompletableFuture<double[]> future) {
+        //super(fxpair_ticker, account_ticker);
+        this.future = future;
+        this.fxclient = OAT.fxclient;
+        this.fxpair = OAT.fxpair;
+        this.account = OAT.account;
+        oandaAutoTrader = OAT;//extendsしたStrategyTemplateの変数oandaAutoTraderに代入
+        this.signal = OAT.signal;
+        this.intS = OAT.intS;
+        this.intM = OAT.intM;
+        this.intL = OAT.intL;
+        this.strategyResult = OAT.strategyResult;
+        this.strategyResultB = OAT.strategyResultB;
+    }
+
+    double[] strategy() {
+        MACD macdA = new MACD(hiashiArrayList, intS, intM, signal);//MACD上
+        MACD macdB = new MACD(hiashiArrayList, intS, intL, signal);//MACD中
+        MACD macdC = new MACD(hiashiArrayList, intM, intL, signal);//MACD下
+        double[] CP = new double[9];
+        //MACDの最新一つだけを取得して代入する
+        CP[0] = macdA.macdHistgram.get(macdA.macdHistgram.size() - 1);//MACDヒストグラム
+        CP[1] = macdA.macdSignal.get(macdA.macdSignal.size() - 1);//シグナル
+        CP[2] = macdA.macdList.get(macdA.macdList.size() - 1);//MACD
+        CP[3] = macdB.macdHistgram.get(macdB.macdHistgram.size() - 1);//MACDヒストグラム
+        CP[4] = macdB.macdSignal.get(macdB.macdSignal.size() - 1);//シグナル
+        CP[5] = macdB.macdList.get(macdB.macdList.size() - 1);//MACD
+        CP[6] = macdC.macdHistgram.get(macdC.macdHistgram.size() - 1);//MACDヒストグラム
+        CP[7] = macdC.macdSignal.get(macdC.macdSignal.size() - 1);//シグナル
+        CP[8] = macdC.macdList.get(macdC.macdList.size() - 1);//MACD
+
+        //for(double a:CP){System.out.println(a);}
+        return CP;//double[]型、0ヒストグラム・1シグナル・2MACDの値を返す
+    }
+
+    /**
+     * 日足(秒・分・時)を取得するメソッド
+     *
+     * @param pair_history Stringでペアを引数に入れる　例＞USD/JPY
+     * @param interval_history longでインターバルを入れる 例＞3000 もしくは TimeGetter.TIME1MIN
+     * @param tick_history intで日足の取得数を入れる 例＞100
+     * @return ArrayList＜Object[]＞の日足セットを返す
+     */
+    public ArrayList<String[]> getHiashiList(FXPair pair_history, long interval_history, int tick_history) {
+        //このクラスのフィールドhiashiArrayListに代入するため、ローカルなインスタンスを準備
+        ArrayList<String[]> hiashiArrayListLocal = new ArrayList<>();
+
+        if (!fxclient.isLoggedIn()) {
+            return null;
+        }
+
+        // ペアの識別
+        FXPair pair = null;
+        if (pair_history.toString().equals("")) {
+            pair = API.createFXPair("USD/JPY"); // default to USD/JPY
+        } else {
+            pair = pair_history;
+        }
+        //System.out.println("FXPair: " + pair);
+
+        // インターバルの取得
+        // 5 = 5 sec
+        // 10 = 10 sec
+        // 30 = 30 sec
+        // 60 = 1 min
+        // 300 = 5 min
+        // 1800 = 30 min
+        // 10800 = 3 hour
+        // 86400  = 1 day
+        long interval_local = interval_history * 1000;  // convert to milliseconds
+        if (interval_local == 0) {//上記の計算結果が0であればデフォルトの数値を使う
+            System.out.println("intervalHistoryの値が0なので、" + (TimeGetter.TIME1DAY * 1000) + "に変更しました。");
+            interval_local = TimeGetter.TIME1DAY * 1000;
+        }
+
+        // get the number of ticks　ティック数をセットする
+        int ticks = tick_history;
+        if (ticks == 0) {
+            ticks = 100; // default to 100 ticks
+        }
+
+        GetHistoryArray gethistoryarray = new GetHistoryArray();
+        hiashiArrayListLocal = gethistoryarray.getHistoryArray(oandaAutoTrader, rateTable, interval_local, ticks);
+
+        return hiashiArrayListLocal;
+    }
+
+    @Override
+    public void run() {
+        try {
+            rateTable = fxclient.getRateTable();//fxclientからRateTableを取得する
+        } catch (SessionDisconnectedException ex) {
+            Logger.getLogger(Strategy_F_macDandP_plugin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //getHiashiList("",0,0)でデフォルト値。日足を取得、継承元のhiashiArrayListにデータを格納。
+        //getHiashiList(fxpair,インターバル,ティック数)
+        hiashiArrayList = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.tickInterval, this.oandaAutoTrader.historyTickTerm);
+        //hiashiArrayListB = getHiashiList(this.oandaAutoTrader.fxpair, this.oandaAutoTrader.tickIntervalB, this.oandaAutoTrader.historyTickTerm);
+
+        strategyResult = strategy();
+
+        //System.out.println("strategyResult:" + Arrays.toString(strategyResult));
+        future.complete(strategyResult);//ここに最終的な値を入れる
+    }
+}

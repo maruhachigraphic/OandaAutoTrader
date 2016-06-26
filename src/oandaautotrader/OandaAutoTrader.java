@@ -25,6 +25,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import strategy.Strategy_E_macDandP_plugin;
+import strategy.Strategy_F_macDandP_plugin;
 
 /**
  * OANDA用の自動売買システム このクラスから始まります
@@ -114,8 +115,9 @@ public class OandaAutoTrader implements Observer {
     public static long tickIntervalB;
     public static int historyTickTerm;//日足の取得期間
     public static int signal;
-    public static int intM;
     public static int intS;
+    public static int intM;
+    public static int intL;
 
     /**
      * MACPのスパン
@@ -147,7 +149,7 @@ public class OandaAutoTrader implements Observer {
         sleepCount = (time * 60 * 1000);
 
         //日足の取得期間を設定
-        tickInterval = TimeGetter.TIME2MIN30SEC;
+        tickInterval = TimeGetter.TIME5MIN;
         tickIntervalB = TimeGetter.TIME15MIN;
 
     }
@@ -176,18 +178,20 @@ public class OandaAutoTrader implements Observer {
                         strategyResult = result;
                         //System.out.println("Result =" + Arrays.toString(result));
                     });
-                    executorFuture.execute(new Strategy_E_macDandP_plugin(thisClass, futureCall));//！！！！ここでストラテジーをnewする！！！！！！
+                    executorFuture.execute(new Strategy_F_macDandP_plugin(thisClass, futureCall));//！！！！ここでストラテジーをnewする！！！！！！
                 }, 1, 30, TimeUnit.SECONDS);//scheduleAtFixedRate,時間指定　10秒
 
         FXRateEvent ticker;
         //ティッカークラスの呼び出し
         switch (strategy) {
             case "TickerE2":
-
                 ticker = new TickerE2(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
                 break;
             case "TickerE3":
                 ticker = new TickerE3(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
+                break;
+            case "TickerF1":
+                ticker = new TickerF1(thisClass, fxpair);//TickerクラスはFXRateEventを継承している。
                 break;
             default:
                 System.out.println("ストラテジーが呼び出されませんでした");
@@ -365,8 +369,9 @@ public class OandaAutoTrader implements Observer {
             this.time = Integer.parseInt(p.getProperty("time"));
             this.historyTickTerm = Integer.parseInt(p.getProperty("historyTickTerm"));
             this.signal = Integer.parseInt(p.getProperty("signal"));
-            this.intM = Integer.parseInt(p.getProperty("intM"));
-            this.intS = Integer.parseInt(p.getProperty("intS"));
+             this.intS = Integer.parseInt(p.getProperty("intS"));
+             this.intM = Integer.parseInt(p.getProperty("intM"));
+             this.intL = Integer.parseInt(p.getProperty("intL"));
             this.macpSpan = Integer.parseInt(p.getProperty("macpSpan"));
 
         } catch (FileNotFoundException ex) {
