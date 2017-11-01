@@ -43,7 +43,7 @@ public class OandaAutoTrader implements Observer {
     /**
      * キー入力用のオブジェクト
      */
-    public static final EasyIn easyIn = new EasyIn();
+    public static final EasyIn EASY_IN = new EasyIn();
 
     // the FXClient object will perform all interactions with the OANDA FXGame/FXTrade server
     public static FXClient fxclient;
